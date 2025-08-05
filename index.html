@@ -1,1 +1,46 @@
-<link rel="stylesheet" href="https://sakofchit.github.io/system.css/system.css">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cocoyams Directory</title>
+  <!-- Classic Mac OS styles from System.css -->
+  <link rel="stylesheet" href="https://sakofchit.github.io/system.css/system.css" />
+  <!-- Custom styles for Cocoyams -->
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Finder‑like main window -->
+  <div class="window" style="width: 320px; margin: 2rem auto;">
+    <div class="title-bar">
+      <button aria-label="Close" class="close"></button>
+      <h1 class="title">Cocoyams Directory</h1>
+      <button aria-label="Resize" class="resize"></button>
+    </div>
+    <div class="separator"></div>
+    <div class="window-pane">
+      <div class="folder-grid">
+        <a class="folder" href="/fits/">
+          <span class="icon">📁</span>
+          <span class="label">FITS</span>
+        </a>
+        <a class="folder" href="/shots/">
+          <span class="icon">📁</span>
+          <span class="label">SHOTS</span>
+        </a>
+        <a class="folder" href="/contact/">
+          <span class="icon">📁</span>
+          <span class="label">CONTACT</span>
+        </a>
+        <a class="folder" href="/about/">
+          <span class="icon">📁</span>
+          <span class="label">ABOUT</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <!-- InteractJS for drag‑and‑drop window movement -->
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <script src="/js/drag.js"></script>
+</body>
+</html>

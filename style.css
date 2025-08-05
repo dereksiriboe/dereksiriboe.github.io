@@ -1,0 +1,78 @@
+/* Additional custom styles for Cocoyams retro site */
+
+/* Grid for folder icons on the home page */
+.folder-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+/* Individual folder icon container */
+.folder-grid .folder {
+  width: 80px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: #000;
+}
+
+.folder-grid .folder span.icon {
+  font-size: 48px;
+  line-height: 48px;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Two‑column list on the Fits landing page */
+.fits-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.fits-list a {
+  text-decoration: none;
+  color: #000;
+}
+
+/* Grid for shoot thumbnails on the Photo Shoots page */
+.shoots-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.shoots-grid a {
+  text-decoration: none;
+  color: #000;
+  text-align: center;
+  width: calc(33.333% - 1rem);
+}
+
+.shoots-grid img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #000;
+}
+
+/* Simple avatar placeholder for the About page */
+.about-avatar {
+  width: 64px;
+  height: 64px;
+  background: #ccc;
+  border: 1px solid #000;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+/* Mobile stacking: make windows full width on narrow screens */
+@media screen and (max-width: 600px) {
+  .window {
+    width: 100% !important;
+    margin: 0.5rem 0 !important;
+    transform: none !important;
+  }
+}
