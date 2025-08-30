@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derek Siriboe</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .location {
+            font-size: 16px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .email {
+            font-size: 16px;
+            font-weight: 300;
+            margin-bottom: 40px;
+        }
+
+        .email a {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .email a:hover {
+            color: #666;
+        }
+
+        .nav {
+            margin-top: 20px;
+        }
+
+        .nav a {
+            font-size: 16px;
+            color: #000;
+            text-decoration: underline;
+            font-weight: 300;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            display: block;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .image-grid {
+            margin-top: 40px;
+        }
+
+        .image-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+
+        .image-item {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-item:hover {
+            opacity: 0.8;
+        }
+
+        /* Different sizes for variety */
+        .image-item.small {
+            width: 80px;
+            height: 80px;
+        }
+
+        .image-item.medium {
+            width: 120px;
+            height: 80px;
+        }
+
+        .image-item.large {
+            width: 160px;
+            height: 80px;
+        }
+
+        .image-item.tall {
+            width: 80px;
+            height: 120px;
+        }
+
+        .image-item.wide {
+            width: 200px;
+            height: 80px;
+        }
+
+        .placeholder-img {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .header {
+                margin-bottom: 30px;
+            }
+            
+            .name {
+                font-size: 16px;
+            }
+            
+            .location, .email {
+                font-size: 14px;
+            }
+            
+            .nav a {
+                font-size: 14px;
+                margin-right: 15px;
+            }
+            
+            .image-row {
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            
+            .image-item {
+                min-width: 50px;
+                min-height: 50px;
+            }
+            
+            .image-item.small {
+                width: 60px;
+                height: 60px;
+            }
+
+            .image-item.medium {
+                width: 90px;
+                height: 60px;
+            }
+
+            .image-item.large {
+                width: 120px;
+                height: 60px;
+            }
+
+            .image-item.tall {
+                width: 60px;
+                height: 90px;
+            }
+
+            .image-item.wide {
+                width: 140px;
+                height: 60px;
+            }
+            
+            .spacer {
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px 10px;
+            }
+            
+            .name {
+                font-size: 15px;
+            }
+            
+            .location, .email {
+                font-size: 13px;
+            }
+            
+            .nav a {
+                font-size: 13px;
+                margin-right: 12px;
+            }
+            
+            .image-row {
+                gap: 6px;
+                margin-bottom: 6px;
+            }
+            
+            .image-item.small {
+                width: 50px;
+                height: 50px;
+            }
+
+            .image-item.medium {
+                width: 75px;
+                height: 50px;
+            }
+
+            .image-item.large {
+                width: 100px;
+                height: 50px;
+            }
+
+            .image-item.tall {
+                width: 50px;
+                height: 75px;
+            }
+
+            .image-item.wide {
+                width: 120px;
+                height: 50px;
+            }
+            
+            .spacer {
+                height: 30px;
+            }
+            
+            .placeholder-img {
+                font-size: 8px;
+            }
+        }
+
+        .spacer {
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Page -->
+        <div class="main-content" id="main-content">
+            <div class="header">
+                <div class="name">Derek Siriboe</div>
+                <div class="location">New York, NY</div>
+                <div class="email">
+                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
+                </div>
+            </div>
+            
+            <div class="nav">
+                <a onclick="showSection('leisure')">leisure</a>
+                <a onclick="showSection('project')">project</a>
+            </div>
+        </div>
+
+        <!-- Leisure Section -->
+        <div class="section" id="leisure-section">
+            <div class="header">
+                <div class="name">Derek Siriboe</div>
+                <div class="location">New York, NY</div>
+                <div class="email">
+                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
+                </div>
+            </div>
+
+            <div class="image-grid">
+                <!-- Row 1 -->
+                <div class="image-row">
+                    <div class="image-item small"><div class="placeholder-img">L1</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L2</div></div>
+                    <div class="image-item large"><div class="placeholder-img">L3</div></div>
+                    <div class="image-item small"><div class="placeholder-img">L4</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L5</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">L6</div></div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="image-row">
+                    <div class="image-item wide"><div class="placeholder-img">L7</div></div>
+                    <div class="image-item small"><div class="placeholder-img">L8</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L9</div></div>
+                    <div class="image-item large"><div class="placeholder-img">L10</div></div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <!-- Row 3 -->
+                <div class="image-row">
+                    <div class="image-item medium"><div class="placeholder-img">L11</div></div>
+                    <div class="image-item small"><div class="placeholder-img">L12</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">L13</div></div>
+                    <div class="image-item wide"><div class="placeholder-img">L14</div></div>
+                    <div class="image-item small"><div class="placeholder-img">L15</div></div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="image-row">
+                    <div class="image-item large"><div class="placeholder-img">L16</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L17</div></div>
+                    <div class="image-item small"><div class="placeholder-img">L18</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">L19</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L20</div></div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <!-- Row 5 -->
+                <div class="image-row">
+                    <div class="image-item small"><div class="placeholder-img">L21</div></div>
+                    <div class="image-item wide"><div class="placeholder-img">L22</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">L23</div></div>
+                    <div class="image-item large"><div class="placeholder-img">L24</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Section -->
+        <div class="section" id="project-section">
+            <div class="header">
+                <div class="name">Derek Siriboe</div>
+                <div class="location">New York, NY</div>
+                <div class="email">
+                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
+                </div>
+            </div>
+
+            <div class="image-grid">
+                <!-- Row 1 -->
+                <div class="image-row">
+                    <div class="image-item tall"><div class="placeholder-img">P1</div></div>
+                    <div class="image-item large"><div class="placeholder-img">P2</div></div>
+                    <div class="image-item small"><div class="placeholder-img">P3</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P4</div></div>
+                    <div class="image-item wide"><div class="placeholder-img">P5</div></div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="image-row">
+                    <div class="image-item medium"><div class="placeholder-img">P6</div></div>
+                    <div class="image-item small"><div class="placeholder-img">P7</div></div>
+                    <div class="image-item large"><div class="placeholder-img">P8</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">P9</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P10</div></div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <!-- Row 3 -->
+                <div class="image-row">
+                    <div class="image-item wide"><div class="placeholder-img">P11</div></div>
+                    <div class="image-item small"><div class="placeholder-img">P12</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P13</div></div>
+                    <div class="image-item large"><div class="placeholder-img">P14</div></div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="image-row">
+                    <div class="image-item small"><div class="placeholder-img">P15</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">P16</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P17</div></div>
+                    <div class="image-item wide"><div class="placeholder-img">P18</div></div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <!-- Row 5 -->
+                <div class="image-row">
+                    <div class="image-item large"><div class="placeholder-img">P19</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P20</div></div>
+                    <div class="image-item small"><div class="placeholder-img">P21</div></div>
+                    <div class="image-item tall"><div class="placeholder-img">P22</div></div>
+                    <div class="image-item medium"><div class="placeholder-img">P23</div></div>
+                </div>
+
+                <!-- Row 6 -->
+                <div class="image-row">
+                    <div class="image-item medium"><div class="placeholder-img">P24</div></div>
+                    <div class="image-item wide"><div class="placeholder-img">P25</div></div>
+                    <div class="image-item small"><div class="placeholder-img">P26</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionName) {
+            // Hide main content
+            document.getElementById('main-content').style.display = 'none';
+            
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').style.display = 'block';
+        }
+
+        function showHome() {
+            // Show main content
+            document.getElementById('main-content').style.display = 'block';
+            
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+        }
+
+        // Click on header to go back home
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.header') && !document.getElementById('main-content').style.display !== 'none') {
+                showHome();
+            }
+        });
+    </script>
+</body>
+</html>
