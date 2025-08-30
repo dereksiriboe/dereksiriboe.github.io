@@ -1,11 +1,9 @@
-# Derek Siriboe Portfolio Website
-
 A minimalist portfolio website with auto-loading image galleries organized by folders.
 
-## 🌐 Live Site
+##  Live Site
 Visit: [cocoyams.com](https://cocoyams.com)
 
-## 📁 How It Works
+## How It Works
 
 This website automatically loads images from folders to create gallery rows. Each folder represents a different project, location, or time period.
 
@@ -145,7 +143,7 @@ body {
 - Live preview
 - Advanced Git features
 
-## 📝 Tips
+##  Tips
 
 ### Organization Ideas
 **Leisure folders:**
