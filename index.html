@@ -139,16 +139,18 @@
             height: 80px;
         }
 
-        .placeholder-img {
+        .image-item img {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #999;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .loading-text {
+            padding: 40px;
             text-align: center;
+            color: #999;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
@@ -304,54 +306,8 @@
                 </div>
             </div>
 
-            <div class="image-grid">
-                <!-- Row 1 -->
-                <div class="image-row">
-                    <div class="image-item small"><div class="placeholder-img">L1</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L2</div></div>
-                    <div class="image-item large"><div class="placeholder-img">L3</div></div>
-                    <div class="image-item small"><div class="placeholder-img">L4</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L5</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">L6</div></div>
-                </div>
-
-                <!-- Row 2 -->
-                <div class="image-row">
-                    <div class="image-item wide"><div class="placeholder-img">L7</div></div>
-                    <div class="image-item small"><div class="placeholder-img">L8</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L9</div></div>
-                    <div class="image-item large"><div class="placeholder-img">L10</div></div>
-                </div>
-
-                <div class="spacer"></div>
-
-                <!-- Row 3 -->
-                <div class="image-row">
-                    <div class="image-item medium"><div class="placeholder-img">L11</div></div>
-                    <div class="image-item small"><div class="placeholder-img">L12</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">L13</div></div>
-                    <div class="image-item wide"><div class="placeholder-img">L14</div></div>
-                    <div class="image-item small"><div class="placeholder-img">L15</div></div>
-                </div>
-
-                <!-- Row 4 -->
-                <div class="image-row">
-                    <div class="image-item large"><div class="placeholder-img">L16</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L17</div></div>
-                    <div class="image-item small"><div class="placeholder-img">L18</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">L19</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L20</div></div>
-                </div>
-
-                <div class="spacer"></div>
-
-                <!-- Row 5 -->
-                <div class="image-row">
-                    <div class="image-item small"><div class="placeholder-img">L21</div></div>
-                    <div class="image-item wide"><div class="placeholder-img">L22</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">L23</div></div>
-                    <div class="image-item large"><div class="placeholder-img">L24</div></div>
-                </div>
+            <div class="image-grid" id="leisure-grid">
+                <!-- Rows will be automatically generated here -->
             </div>
         </div>
 
@@ -365,60 +321,8 @@
                 </div>
             </div>
 
-            <div class="image-grid">
-                <!-- Row 1 -->
-                <div class="image-row">
-                    <div class="image-item tall"><div class="placeholder-img">P1</div></div>
-                    <div class="image-item large"><div class="placeholder-img">P2</div></div>
-                    <div class="image-item small"><div class="placeholder-img">P3</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P4</div></div>
-                    <div class="image-item wide"><div class="placeholder-img">P5</div></div>
-                </div>
-
-                <!-- Row 2 -->
-                <div class="image-row">
-                    <div class="image-item medium"><div class="placeholder-img">P6</div></div>
-                    <div class="image-item small"><div class="placeholder-img">P7</div></div>
-                    <div class="image-item large"><div class="placeholder-img">P8</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">P9</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P10</div></div>
-                </div>
-
-                <div class="spacer"></div>
-
-                <!-- Row 3 -->
-                <div class="image-row">
-                    <div class="image-item wide"><div class="placeholder-img">P11</div></div>
-                    <div class="image-item small"><div class="placeholder-img">P12</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P13</div></div>
-                    <div class="image-item large"><div class="placeholder-img">P14</div></div>
-                </div>
-
-                <!-- Row 4 -->
-                <div class="image-row">
-                    <div class="image-item small"><div class="placeholder-img">P15</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">P16</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P17</div></div>
-                    <div class="image-item wide"><div class="placeholder-img">P18</div></div>
-                </div>
-
-                <div class="spacer"></div>
-
-                <!-- Row 5 -->
-                <div class="image-row">
-                    <div class="image-item large"><div class="placeholder-img">P19</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P20</div></div>
-                    <div class="image-item small"><div class="placeholder-img">P21</div></div>
-                    <div class="image-item tall"><div class="placeholder-img">P22</div></div>
-                    <div class="image-item medium"><div class="placeholder-img">P23</div></div>
-                </div>
-
-                <!-- Row 6 -->
-                <div class="image-row">
-                    <div class="image-item medium"><div class="placeholder-img">P24</div></div>
-                    <div class="image-item wide"><div class="placeholder-img">P25</div></div>
-                    <div class="image-item small"><div class="placeholder-img">P26</div></div>
-                </div>
+            <div class="image-grid" id="project-grid">
+                <!-- Rows will be automatically generated here -->
             </div>
         </div>
     </div>
