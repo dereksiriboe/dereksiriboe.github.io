@@ -78,8 +78,28 @@
             cursor: pointer;
         }
 
-        .main-content {
-            display: block;
+        .hero-image {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 60vh;
+            object-fit: cover;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero-image {
+                margin: 30px 0;
+            }
+            
+            .hero-image img {
+                max-height: 50vh;
+            }
         }
 
         .section {
@@ -288,6 +308,11 @@
                 <div class="email">
                     <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
                 </div>
+            </div>
+            
+            <!-- Hero Image -->
+            <div class="hero-image">
+                <img src="images/hero.jpg" alt="Derek Siriboe" id="hero-img" style="display: none;">
             </div>
             
             <div class="nav">
