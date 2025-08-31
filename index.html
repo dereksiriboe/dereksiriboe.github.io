@@ -353,6 +353,138 @@
     </div>
 
     <script>
+        // 📁 EDIT THIS SECTION - Add your folder names here
+        const folderStructure = {
+            leisure: [
+                'Cinestill 50D',        // ← Replace with your actual folder names
+                'Cinestill 400D', 
+                'weekend-vibes',
+                'summer-2024',
+                'friends'
+            ],
+            project: [
+                'stussy-campaign',   // ← Replace with your actual folder names
+                'thrasher-shoot',
+                'nike-collaboration',
+                'street-portraits',
+                'brand-work'
+            ]
+        };
+
+        // Common image extensions
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        
+        // Size classes for variety
+        const sizeClasses = ['small', 'medium', 'large', 'tall', 'wide'];
+
+        async function loadImagesFromFolder(section, folderName) {
+            const images = [];
+            
+            // Try different common image names
+            const commonNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 
+                               'img1', 'img2', 'img3', 'img4', 'img5',
+                               'photo1', 'photo2', 'photo3', 'photo4', 'photo5'];
+            
+            for (const name of commonNames) {
+                for (const ext of imageExtensions) {
+                    const imagePath = `images/${section}/${folderName}/${name}.${ext}`;
+                    
+                    try {
+                        const response = await fetch(imagePath, { method: 'HEAD' });
+                        if (response.ok) {
+                            images.push(imagePath);
+                        }
+                    } catch (error) {
+                        // Image doesn't exist, continue
+                    }
+                }
+            }
+            
+            return images;
+        }
+
+        function createImageRow(images, folderName) {
+            const row = document.createElement('div');
+            row.className = 'image-row';
+            row.title = folderName.replace('-', ' '); // Show folder name on hover
+            
+            images.forEach((imagePath, index) => {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = `image-item ${sizeClasses[index % sizeClasses.length]}`;
+                
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = `${folderName} image ${index + 1}`;
+                img.loading = 'lazy'; // Lazy loading for performance
+                
+                imageContainer.appendChild(img);
+                row.appendChild(imageContainer);
+            });
+            
+            return row;
+        }
+
+        async function loadSection(sectionName) {
+            const grid = document.getElementById(`${sectionName}-grid`);
+            grid.innerHTML = '<div class="loading-text">Loading images...</div>';
+            
+            const folders = folderStructure[sectionName];
+            let hasImages = false;
+            
+            for (let i = 0; i < folders.length; i++) {
+                const folderName = folders[i];
+                const images = await loadImagesFromFolder(sectionName, folderName);
+                
+                if (images.length > 0) {
+                    if (hasImages && i > 0 && i % 2 === 0) {
+                        // Add spacer every 2 rows
+                        const spacer = document.createElement('div');
+                        spacer.className = 'spacer';
+                        grid.appendChild(spacer);
+                    }
+                    
+                    const row = createImageRow(images, folderName);
+                    grid.appendChild(row);
+                    hasImages = true;
+                }
+            }
+            
+            if (!hasImages) {
+                grid.innerHTML = '<div class="loading-text">No images found. Upload images to the folders!</div>';
+            } else {
+                // Remove loading text
+                const loadingText = grid.querySelector('.loading-text');
+                if (loadingText) {
+                    loadingText.remove();
+                }
+            }
+        }
+
+        // Check if hero image exists and show it
+        function loadHeroImage() {
+            const heroImg = document.getElementById('hero-img');
+            const possiblePaths = [
+                'images/hero.jpg',
+                'images/hero.jpeg',
+                'images/hero.png',
+                'images/hero.webp',
+                'images/profile.jpg',
+                'images/profile.jpeg',
+                'images/profile.png'
+            ];
+            
+            // Try each possible hero image path
+            for (const path of possiblePaths) {
+                const testImg = new Image();
+                testImg.onload = function() {
+                    heroImg.src = path;
+                    heroImg.style.display = 'block';
+                    return;
+                };
+                testImg.src = path;
+            }
+        }
+
         function showSection(sectionName) {
             // Hide main content
             document.getElementById('main-content').style.display = 'none';
@@ -365,6 +497,9 @@
             
             // Show selected section
             document.getElementById(sectionName + '-section').style.display = 'block';
+            
+            // Load images for this section
+            loadSection(sectionName);
         }
 
         function showHome() {
@@ -378,9 +513,12 @@
             });
         }
 
+        // Load hero image when page loads
+        document.addEventListener('DOMContentLoaded', loadHeroImage);
+
         // Click on header to go back home
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.header') && !document.getElementById('main-content').style.display !== 'none') {
+            if (e.target.closest('.header') && document.getElementById('main-content').style.display === 'none') {
                 showHome();
             }
         });
