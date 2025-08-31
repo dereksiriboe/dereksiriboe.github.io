@@ -1,522 +1,223 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Derek Siriboe</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <title>Derek Siriboe</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <style>
+    :root{ --fg:#000; --muted:#666; --max:1200px; }
+    *{ box-sizing:border-box; margin:0; padding:0 }
+    html,body{ background:#fff; color:var(--fg);
+      font:16px/1.6 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif; }
 
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #ffffff;
-            color: #000000;
-            line-height: 1.6;
-            font-size: 16px;
-            font-weight: 400;
-        }
+    /* layout */
+    .container{ max-width:var(--max); margin:0 auto; padding:40px; min-height:100vh; }
+    .header{ margin-bottom:40px; cursor:pointer; }
+    .name{ font-size:18px; font-weight:500; }
+    .location,.email{ font-size:16px; color:var(--muted); }
+    .email a{ color:inherit; text-decoration:none }
+    .email a:hover{ text-decoration:underline }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px;
-            min-height: 100vh;
-        }
+    .nav{ margin-top:24px }
+    .nav a{ text-decoration:underline; margin-right:20px; color:var(--fg) }
 
-        .header {
-            margin-bottom: 40px;
-        }
+    .hero-image{ margin:40px 0; text-align:center }
+    .hero-image img{ max-width:100%; height:auto; max-height:60vh; object-fit:cover }
 
-        .name {
-            font-size: 18px;
-            font-weight: 400;
-            margin-bottom: 8px;
-        }
+    /* sections */
+    .section{ display:none }
+    .image-grid{ margin-top:40px }
+    .image-row{ display:flex; gap:10px; margin-bottom:10px; align-items:flex-start }
+    .image-item{ background:#eee; border-radius:4px; overflow:hidden }
+    .image-item img{ width:100%; height:100%; object-fit:cover; display:block }
 
-        .location {
-            font-size: 16px;
-            font-weight: 300;
-            margin-bottom: 8px;
-            color: #666;
-        }
+    /* variety sizes */
+    .small{ width:80px; height:80px }
+    .medium{ width:120px; height:80px }
+    .large{ width:160px; height:80px }
+    .tall{ width:80px; height:120px }
+    .wide{ width:200px; height:80px }
 
-        .email {
-            font-size: 16px;
-            font-weight: 300;
-            margin-bottom: 40px;
-        }
+    .spacer{ height:60px }
 
-        .email a {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
+    /* sticky banner on subpages */
+    .banner{ position:sticky; top:0; background:#fff; z-index:2; border-bottom:1px solid #eee }
+    .banner .inner{ max-width:var(--max); margin:0 auto; padding:24px 40px }
 
-        .email a:hover {
-            color: #666;
-        }
-
-        .nav {
-            margin-top: 20px;
-        }
-
-        .nav a {
-            font-size: 16px;
-            color: #000;
-            text-decoration: underline;
-            font-weight: 300;
-            margin-right: 20px;
-            cursor: pointer;
-        }
-
-        .hero-image {
-            margin: 40px 0;
-            text-align: center;
-        }
-
-        .hero-image img {
-            max-width: 100%;
-            height: auto;
-            max-height: 60vh;
-            object-fit: cover;
-            border-radius: 4px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        @media (max-width: 768px) {
-            .hero-image {
-                margin: 30px 0;
-            }
-            
-            .hero-image img {
-                max-height: 50vh;
-            }
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        .image-grid {
-            margin-top: 40px;
-        }
-
-        .image-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: flex-start;
-        }
-
-        .image-item {
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-        }
-
-        .image-item:hover {
-            opacity: 0.8;
-        }
-
-        /* Different sizes for variety */
-        .image-item.small {
-            width: 80px;
-            height: 80px;
-        }
-
-        .image-item.medium {
-            width: 120px;
-            height: 80px;
-        }
-
-        .image-item.large {
-            width: 160px;
-            height: 80px;
-        }
-
-        .image-item.tall {
-            width: 80px;
-            height: 120px;
-        }
-
-        .image-item.wide {
-            width: 200px;
-            height: 80px;
-        }
-
-        .image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .loading-text {
-            padding: 40px;
-            text-align: center;
-            color: #999;
-            font-size: 14px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            
-            .header {
-                margin-bottom: 30px;
-            }
-            
-            .name {
-                font-size: 16px;
-            }
-            
-            .location, .email {
-                font-size: 14px;
-            }
-            
-            .nav a {
-                font-size: 14px;
-                margin-right: 15px;
-            }
-            
-            .image-row {
-                flex-wrap: wrap;
-                gap: 8px;
-                margin-bottom: 8px;
-            }
-            
-            .image-item {
-                min-width: 50px;
-                min-height: 50px;
-            }
-            
-            .image-item.small {
-                width: 60px;
-                height: 60px;
-            }
-
-            .image-item.medium {
-                width: 90px;
-                height: 60px;
-            }
-
-            .image-item.large {
-                width: 120px;
-                height: 60px;
-            }
-
-            .image-item.tall {
-                width: 60px;
-                height: 90px;
-            }
-
-            .image-item.wide {
-                width: 140px;
-                height: 60px;
-            }
-            
-            .spacer {
-                height: 40px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px 10px;
-            }
-            
-            .name {
-                font-size: 15px;
-            }
-            
-            .location, .email {
-                font-size: 13px;
-            }
-            
-            .nav a {
-                font-size: 13px;
-                margin-right: 12px;
-            }
-            
-            .image-row {
-                gap: 6px;
-                margin-bottom: 6px;
-            }
-            
-            .image-item.small {
-                width: 50px;
-                height: 50px;
-            }
-
-            .image-item.medium {
-                width: 75px;
-                height: 50px;
-            }
-
-            .image-item.large {
-                width: 100px;
-                height: 50px;
-            }
-
-            .image-item.tall {
-                width: 50px;
-                height: 75px;
-            }
-
-            .image-item.wide {
-                width: 120px;
-                height: 50px;
-            }
-            
-            .spacer {
-                height: 30px;
-            }
-            
-            .placeholder-img {
-                font-size: 8px;
-            }
-        }
-
-        .spacer {
-            height: 60px;
-        }
-    </style>
+    /* responsive */
+    @media (max-width:768px){
+      .container{ padding:22px 16px }
+      .banner .inner{ padding:18px 16px }
+      .small{ width:60px; height:60px }
+      .medium{ width:90px; height:60px }
+      .large{ width:120px; height:60px }
+      .tall{ width:60px; height:90px }
+      .wide{ width:140px; height:60px }
+      .spacer{ height:40px }
+    }
+    @media (max-width:480px){
+      .small{ width:50px; height:50px }
+      .medium{ width:75px; height:50px }
+      .large{ width:100px; height:50px }
+      .tall{ width:50px; height:75px }
+      .wide{ width:120px; height:50px }
+      .spacer{ height:30px }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Main Page -->
-        <div class="main-content" id="main-content">
-            <div class="header">
-                <div class="name">Derek Siriboe</div>
-                <div class="location">New York, NY</div>
-                <div class="email">
-                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
-                </div>
-            </div>
-            
-            <!-- Hero Image -->
-            <div class="hero-image">
-                <img src="images/hero.jpg" alt="Derek Siriboe" id="hero-img" style="display: none;">
-            </div>
-            
-            <div class="nav">
-                <a onclick="showSection('leisure')">leisure</a>
-                <a onclick="showSection('project')">project</a>
-            </div>
-        </div>
+  <div class="container" id="home">
+    <!-- Home -->
+    <div class="main-content" id="main-content">
+      <div class="header" data-home>
+        <div class="name">Derek Siriboe</div>
+        <div class="location">New York, NY</div>
+        <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
+      </div>
 
-        <!-- Leisure Section -->
-        <div class="section" id="leisure-section">
-            <div class="header">
-                <div class="name">Derek Siriboe</div>
-                <div class="location">New York, NY</div>
-                <div class="email">
-                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
-                </div>
-            </div>
+      <div class="hero-image">
+        <img id="hero-img" alt="Derek Siriboe" style="display:none">
+      </div>
 
-            <div class="image-grid" id="leisure-grid">
-                <!-- Rows will be automatically generated here -->
-            </div>
-        </div>
-
-        <!-- Project Section -->
-        <div class="section" id="project-section">
-            <div class="header">
-                <div class="name">Derek Siriboe</div>
-                <div class="location">New York, NY</div>
-                <div class="email">
-                    <a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a>
-                </div>
-            </div>
-
-            <div class="image-grid" id="project-grid">
-                <!-- Rows will be automatically generated here -->
-            </div>
-        </div>
+      <nav class="nav">
+        <a href="#leisure">leisure</a>
+        <a href="#project">project</a>
+      </nav>
     </div>
 
-    <script>
-        // 📁 EDIT THIS SECTION - Add your folder names here
-        const folderStructure = {
-            leisure: [
-                'Cinestill 50D',        // ← Replace with your actual folder names
-                'Cinestill 400D'
-            ],
-            project: [
-                'DenisonU',   // ← Replace with your actual folder names
-                'Flower Child Vintage',
-                'Hocking Hills State Park'
-            ]
-        };
+    <!-- Leisure -->
+    <div class="section" id="leisure-section">
+      <header class="banner" data-home>
+        <div class="inner">
+          <div class="name">Derek Siriboe</div>
+          <div class="location">New York, NY</div>
+          <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
+        </div>
+      </header>
+      <main class="image-grid" id="leisure-grid"></main>
+    </div>
 
-        // Common image extensions
-        const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-        
-        // Size classes for variety
-        const sizeClasses = ['small', 'medium', 'large', 'tall', 'wide'];
+    <!-- Project -->
+    <div class="section" id="project-section">
+      <header class="banner" data-home>
+        <div class="inner">
+          <div class="name">Derek Siriboe</div>
+          <div class="location">New York, NY</div>
+          <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
+        </div>
+      </header>
+      <main class="image-grid" id="project-grid"></main>
+    </div>
+  </div>
 
-        async function loadImagesFromFolder(section, folderName) {
-            const images = [];
-            
-            // Try different common image names
-            const commonNames = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 
-                               'img1', 'img2', 'img3', 'img4', 'img5',
-                               'photo1', 'photo2', 'photo3', 'photo4', 'photo5'];
-            
-            for (const name of commonNames) {
-                for (const ext of imageExtensions) {
-                    const imagePath = `images/${section}/${folderName}/${name}.${ext}`;
-                    
-                    try {
-                        const response = await fetch(imagePath, { method: 'HEAD' });
-                        if (response.ok) {
-                            images.push(imagePath);
-                        }
-                    } catch (error) {
-                        // Image doesn't exist, continue
-                    }
-                }
+  <script>
+    /* --- Optional hero image auto-detect --- */
+    function loadHeroImage(){
+      const hero = document.getElementById('hero-img');
+      const candidates = [
+        'images/hero.jpg','images/hero.jpeg','images/hero.png','images/hero.webp',
+        'images/profile.jpg','images/profile.jpeg','images/profile.png'
+      ];
+      for (const p of candidates){
+        const test = new Image();
+        test.onload = ()=>{ if (!hero.src){ hero.src=p; hero.style.display='block'; } };
+        test.src = p;
+      }
+    }
+
+    /* --- JSON rows renderer --- */
+    const sizeClasses = ['small','medium','large','tall','wide'];
+
+    async function renderRows(jsonPath, mountId){
+      const mount = document.getElementById(mountId);
+      mount.innerHTML = '<div class="loading" style="color:#999;padding:40px;text-align:center">Loading images…</div>';
+      try{
+        const data = await (await fetch(jsonPath, {cache:'no-store'})).json();
+        mount.innerHTML = '';
+        let counter = 0;
+
+        for (const row of data.rows){
+          if (row.spacer){
+            const s = document.createElement('div');
+            s.className = 'spacer';
+            s.style.height = (row.spacer + 'px');
+            mount.appendChild(s);
+            continue;
+          }
+          const line = document.createElement('div');
+          line.className = 'image-row';
+
+          row.forEach((item, i) => {
+            const obj = (typeof item === 'string') ? {file:item} : item;
+            const cell = document.createElement('div');
+            cell.className = `image-item ${sizeClasses[(counter+i)%sizeClasses.length]}`;
+
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = obj.file;
+            img.alt = (obj.alt || obj.file.split('/').pop().replace(/\.[^.]+$/,'').replace(/[-_]/g,' '));
+
+            if (obj.href){
+              const link = document.createElement('a');
+              link.href = obj.href; link.target = '_blank'; link.rel = 'noopener';
+              link.appendChild(img); cell.appendChild(link);
+            }else{
+              cell.appendChild(img);
             }
-            
-            return images;
+            line.appendChild(cell);
+          });
+
+          mount.appendChild(line);
+          counter += row.length || 1;
         }
 
-        function createImageRow(images, folderName) {
-            const row = document.createElement('div');
-            row.className = 'image-row';
-            row.title = folderName.replace('-', ' '); // Show folder name on hover
-            
-            images.forEach((imagePath, index) => {
-                const imageContainer = document.createElement('div');
-                imageContainer.className = `image-item ${sizeClasses[index % sizeClasses.length]}`;
-                
-                const img = document.createElement('img');
-                img.src = imagePath;
-                img.alt = `${folderName} image ${index + 1}`;
-                img.loading = 'lazy'; // Lazy loading for performance
-                
-                imageContainer.appendChild(img);
-                row.appendChild(imageContainer);
-            });
-            
-            return row;
+        if (!mount.children.length){
+          mount.innerHTML = '<div style="color:#999;padding:40px;text-align:center">No images found.</div>';
         }
+      }catch(err){
+        console.error(err);
+        mount.innerHTML = '<div style="color:#999;padding:40px;text-align:center">Could not load gallery.</div>';
+      }
+    }
 
-        async function loadSection(sectionName) {
-            const grid = document.getElementById(`${sectionName}-grid`);
-            grid.innerHTML = '<div class="loading-text">Loading images...</div>';
-            
-            const folders = folderStructure[sectionName];
-            let hasImages = false;
-            
-            for (let i = 0; i < folders.length; i++) {
-                const folderName = folders[i];
-                const images = await loadImagesFromFolder(sectionName, folderName);
-                
-                if (images.length > 0) {
-                    if (hasImages && i > 0 && i % 2 === 0) {
-                        // Add spacer every 2 rows
-                        const spacer = document.createElement('div');
-                        spacer.className = 'spacer';
-                        grid.appendChild(spacer);
-                    }
-                    
-                    const row = createImageRow(images, folderName);
-                    grid.appendChild(row);
-                    hasImages = true;
-                }
-            }
-            
-            if (!hasImages) {
-                grid.innerHTML = '<div class="loading-text">No images found. Upload images to the folders!</div>';
-            } else {
-                // Remove loading text
-                const loadingText = grid.querySelector('.loading-text');
-                if (loadingText) {
-                    loadingText.remove();
-                }
-            }
-        }
+    /* --- Simple hash router (so Back/Forward works) --- */
+    function showHome(){
+      document.getElementById('main-content').style.display = 'block';
+      document.getElementById('leisure-section').style.display = 'none';
+      document.getElementById('project-section').style.display = 'none';
+    }
+    async function showLeisure(){
+      document.getElementById('main-content').style.display = 'none';
+      document.getElementById('project-section').style.display = 'none';
+      document.getElementById('leisure-section').style.display = 'block';
+      await renderRows('data/leisure.json', 'leisure-grid');
+    }
+    async function showProject(){
+      document.getElementById('main-content').style.display = 'none';
+      document.getElementById('leisure-section').style.display = 'none';
+      document.getElementById('project-section').style.display = 'block';
+      await renderRows('data/project.json', 'project-grid');
+    }
+    function route(){
+      const h = location.hash.replace('#','');
+      if (h === 'leisure') return showLeisure();
+      if (h === 'project') return showProject();
+      return showHome();
+    }
 
-        // Check if hero image exists and show it
-        function loadHeroImage() {
-            const heroImg = document.getElementById('hero-img');
-            const possiblePaths = [
-                'images/hero.jpg',
-                'images/hero.jpeg',
-                'images/hero.png',
-                'images/hero.webp',
-                'images/profile.jpg',
-                'images/profile.jpeg',
-                'images/profile.png'
-            ];
-            
-            // Try each possible hero image path
-            for (const path of possiblePaths) {
-                const testImg = new Image();
-                testImg.onload = function() {
-                    heroImg.src = path;
-                    heroImg.style.display = 'block';
-                    return;
-                };
-                testImg.src = path;
-            }
-        }
+    /* click banner to return home */
+    document.addEventListener('click', (e)=>{
+      if (e.target.closest('[data-home]') && document.getElementById('main-content').style.display === 'none'){
+        location.hash = '';
+      }
+    });
 
-        function showSection(sectionName) {
-            // Hide main content
-            document.getElementById('main-content').style.display = 'none';
-            
-            // Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            // Show selected section
-            document.getElementById(sectionName + '-section').style.display = 'block';
-            
-            // Load images for this section
-            loadSection(sectionName);
-        }
-
-        function showHome() {
-            // Show main content
-            document.getElementById('main-content').style.display = 'block';
-            
-            // Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-        }
-
-        // Load hero image when page loads
-        document.addEventListener('DOMContentLoaded', loadHeroImage);
-
-        // Click on header to go back home
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.header') && document.getElementById('main-content').style.display === 'none') {
-                showHome();
-            }
-        });
-    </script>
+    window.addEventListener('hashchange', route);
+    document.addEventListener('DOMContentLoaded', () => { loadHeroImage(); route(); });
+  </script>
 </body>
 </html>
