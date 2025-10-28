@@ -1,26 +1,26 @@
 {
   "rows": [
     {
-      "folder": "images/design/ui-ux/wireframes",
+      "folder": "wireframes",
       "items": [
-        {"file": "images/design/ui-ux/wireframes/mockup-001.svg", "alt": "UI flow board", "size": "large"},
+        {"file": "images/design/ui-ux/mockup-001.svg", "alt": "UI flow board", "size": "large"},
         {"type": "accent", "color": "#FF6B35", "size": "small"},
-        {"file": "images/design/ui-ux/wireframes/mockup-002.svg", "alt": "Prototype notes", "size": "medium"}
+        {"file": "images/design/ui-ux/mockup-002.svg", "alt": "Prototype notes", "size": "medium"}
       ]
     },
     {
-      "folder": "images/design/ui-ux/interaction-demos",
+      "folder": "interaction-demos",
       "items": [
-        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/design/ui-ux/interaction-demos/poster.svg", "size": "wide"},
+        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/photo/fun/fun-003.jpg", "size": "wide"},
         {"type": "youtube", "videoId": "ysz5S6PUM-U", "thumbnail": "auto", "size": "large"}
       ]
     },
     {"spacer": 60},
     {
-      "folder": "images/design/ui-ux/sound-branding",
+      "folder": "sound-branding",
       "items": [
         {"type": "spotify", "url": "https://open.spotify.com/playlist/37i9dQZF1DX8ymr6UES7vc", "size": "wide"},
-        {"file": "images/design/ui-ux/sound-branding/mood-001.svg", "alt": "Brand mood reference", "size": "medium"}
+        {"file": "images/photo/project/photo-proj-001.jpg", "alt": "Brand mood reference", "size": "medium"}
       ]
     }
   ]

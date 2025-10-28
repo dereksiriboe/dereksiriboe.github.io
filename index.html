@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Derek Siriboe — Portfolio</title>
+  <title>Derek Siriboe</title>
   <link rel="icon" href="favicon.ico">
   <style>
     :root {
@@ -24,7 +24,7 @@
       padding: 0;
       background: var(--primary-bg);
       color: var(--primary-fg);
-      font-family: 'Times New Roman', Times, serif;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
       font-size: 16px;
       line-height: 1.6;
     }
@@ -135,95 +135,6 @@
       flex-wrap: wrap;
       gap: var(--gutter);
       align-items: flex-start;
-    }
-
-    .grid-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      width: 100%;
-    }
-
-    .row-block {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-    }
-
-    .row-title {
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .grid-spacer {
-      width: 100%;
-      height: 40px;
-      flex: 0 0 auto;
-    }
-
-    .lightbox {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-      z-index: 200;
-    }
-
-    .lightbox.is-active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .lightbox-content {
-      max-width: 90vw;
-      max-height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      gap: 16px;
-    }
-
-    .lightbox-content img,
-    .lightbox-content video {
-      max-width: 100%;
-      max-height: 90vh;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      background: #000;
-    }
-
-    .lightbox-close {
-      position: absolute;
-      top: -16px;
-      right: -16px;
-      width: 32px;
-      height: 32px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.6);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .lightbox-close:hover,
-    .lightbox-close:focus {
-      background: rgba(0, 0, 0, 0.8);
     }
 
     .grid-item {
@@ -379,32 +290,25 @@
     <main class="content" id="content" role="main"></main>
   </div>
 
-  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-    <div class="lightbox-content">
-      <button type="button" class="lightbox-close" aria-label="Close preview">&times;</button>
-      <div id="lightbox-media"></div>
-    </div>
-  </div>
-
   <template id="home-template">
     <section class="home-view" aria-label="Featured work">
       <p class="home-description">
         Minimal commissions and ongoing experiments across style, photo, and audio-visual practice.
       </p>
       <div class="grid hero-grid">
-        <div class="grid-item wide" data-lightbox-type="image" data-lightbox-src="images/style/project/lookbook-series/look-001.svg" data-lightbox-alt="Editorial lookbook pose"><img src="images/style/project/lookbook-series/look-001.svg" alt="Editorial lookbook pose" loading="lazy"></div>
+        <div class="grid-item wide"><img src="images/style/project/project-001.jpg" alt="Editorial lookbook pose" loading="lazy"></div>
         <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item tall" data-lightbox-type="image" data-lightbox-src="images/style/private-client/feature-lookbook/look-001.svg" data-lightbox-alt="Private client portrait"><img src="images/style/private-client/feature-lookbook/look-001.svg" alt="Private client portrait" loading="lazy"></div>
-        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/photo/fun/travel-diaries/travel-001.svg" data-lightbox-alt="Road trip snapshot"><img src="images/photo/fun/travel-diaries/travel-001.svg" alt="Road trip snapshot" loading="lazy"></div>
-        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/photo/project/campaign-portraits/portrait-001.svg" data-lightbox-alt="Brand shoot portrait"><img src="images/photo/project/campaign-portraits/portrait-001.svg" alt="Brand shoot portrait" loading="lazy"></div>
+        <div class="grid-item tall"><img src="images/style/private-client/client-001.jpg" alt="Private client portrait" loading="lazy"></div>
+        <div class="grid-item medium"><img src="images/photo/fun/fun-001.jpg" alt="Road trip snapshot" loading="lazy"></div>
+        <div class="grid-item large"><img src="images/photo/project/photo-proj-001.jpg" alt="Brand shoot portrait" loading="lazy"></div>
         <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/style/project/studio-energy/still-001.svg" data-lightbox-alt="Studio lighting experiment"><img src="images/style/project/studio-energy/still-001.svg" alt="Studio lighting experiment" loading="lazy"></div>
-        <div class="grid-item wide" data-lightbox-type="image" data-lightbox-src="images/photo/fun/travel-diaries/travel-002.svg" data-lightbox-alt="Sunset over water"><img src="images/photo/fun/travel-diaries/travel-002.svg" alt="Sunset over water" loading="lazy"></div>
-        <div class="grid-item tall" data-lightbox-type="image" data-lightbox-src="images/photo/project/campaign-portraits/portrait-002.svg" data-lightbox-alt="Product detail"><img src="images/photo/project/campaign-portraits/portrait-002.svg" alt="Product detail" loading="lazy"></div>
-        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/style/private-client/feature-lookbook/look-002.svg" data-lightbox-alt="Client posing in studio"><img src="images/style/private-client/feature-lookbook/look-002.svg" alt="Client posing in studio" loading="lazy"></div>
+        <div class="grid-item large"><img src="images/style/project/project-003.jpg" alt="Studio lighting experiment" loading="lazy"></div>
+        <div class="grid-item wide"><img src="images/photo/fun/fun-002.jpg" alt="Sunset over water" loading="lazy"></div>
+        <div class="grid-item tall"><img src="images/photo/project/photo-proj-002.jpg" alt="Product detail" loading="lazy"></div>
+        <div class="grid-item medium"><img src="images/style/private-client/client-002.jpg" alt="Client posing in studio" loading="lazy"></div>
         <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/style/private-client/studio-motion/still-001.svg" data-lightbox-alt="Editorial-style portrait"><img src="images/style/private-client/studio-motion/still-001.svg" alt="Editorial-style portrait" loading="lazy"></div>
-        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/photo/fun/street-notes/street-001.svg" data-lightbox-alt="Candid street scene"><img src="images/photo/fun/street-notes/street-001.svg" alt="Candid street scene" loading="lazy"></div>
+        <div class="grid-item large"><img src="images/style/private-client/client-003.jpg" alt="Editorial-style portrait" loading="lazy"></div>
+        <div class="grid-item medium"><img src="images/photo/fun/fun-003.jpg" alt="Candid street scene" loading="lazy"></div>
       </div>
     </section>
   </template>
@@ -445,15 +349,6 @@
           { id: 'audio-visual-sound', label: 'sound', data: 'data/audio-visual-sound.json' },
           { id: 'audio-visual-video', label: 'video', data: 'data/audio-visual-video.json' }
         ]
-      },
-      {
-        id: 'design',
-        label: 'design',
-        defaultSubsection: 'design-garment',
-        subsections: [
-          { id: 'design-garment', label: 'garment', data: 'data/design-garment.json' },
-          { id: 'design-ui-ux', label: 'ui-ux', data: 'data/design-ui-ux.json' }
-        ]
       }
     ];
 
@@ -472,10 +367,6 @@
     const homeTemplate = document.getElementById('home-template');
     const loadingTemplate = document.getElementById('loading-template');
     const errorTemplate = document.getElementById('error-template');
-    const lightbox = document.getElementById('lightbox');
-    const lightboxMedia = document.getElementById('lightbox-media');
-    const lightboxClose = lightbox.querySelector('.lightbox-close');
-    let lastFocusedElement = null;
 
     function buildPrimaryNav() {
       primaryNav.innerHTML = '';
@@ -496,7 +387,6 @@
 
     function renderHome() {
       document.body.classList.remove('is-subpage');
-      closeLightbox();
       setActivePrimary(null);
       subNavContainer.innerHTML = '';
       content.innerHTML = '';
@@ -542,7 +432,7 @@
       const normalized = { ...item };
       if (!normalized.type && normalized.file) {
         const ext = normalized.file.split('.').pop().toLowerCase();
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'svg'].includes(ext)) {
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp'].includes(ext)) {
           normalized.type = 'image';
         } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
           normalized.type = 'audio';
@@ -615,23 +505,14 @@
             video.poster = normalized.poster;
           }
           wrapper.appendChild(video);
-          wrapper.dataset.lightboxType = 'video';
-          wrapper.dataset.lightboxSrc = normalized.file;
-          if (normalized.poster) {
-            wrapper.dataset.lightboxPoster = normalized.poster;
-          }
           break;
         }
         default: {
           const img = document.createElement('img');
           img.loading = 'lazy';
           img.src = normalized.file;
-          const altText = normalized.alt || deriveAlt(normalized.file);
-          img.alt = altText;
+          img.alt = normalized.alt || deriveAlt(normalized.file);
           wrapper.appendChild(img);
-          wrapper.dataset.lightboxType = 'image';
-          wrapper.dataset.lightboxSrc = normalized.file;
-          wrapper.dataset.lightboxAlt = altText;
         }
       }
 
@@ -657,113 +538,28 @@
       return path.split('/').pop().split('.').shift().replace(/[-_]/g, ' ');
     }
 
-    function formatRowTitle(value = '') {
-      return value
-        .split('/')
-        .pop()
-        .replace(/[-_]+/g, ' ')
-        .replace(/\b\w/g, char => char.toUpperCase());
-    }
-
-    function createRowBlock(title, items) {
-      const rowSection = document.createElement('section');
-      rowSection.className = 'row-block';
-
-      if (title) {
-        const heading = document.createElement('h2');
-        heading.className = 'row-title';
-        heading.textContent = title;
-        rowSection.appendChild(heading);
-      }
-
-      const grid = document.createElement('div');
-      grid.className = 'grid';
-      items.forEach(item => {
-        const element = createGridItem(item);
-        if (element) {
-          grid.appendChild(element);
-        }
-      });
-
-      rowSection.appendChild(grid);
-      return rowSection;
-    }
-
     function renderGrid(rows) {
-      const container = document.createElement('div');
-      container.className = 'grid-rows';
+      const grid = document.createElement('div');
+      grid.className = 'grid content-grid';
       rows.forEach(row => {
         if (Array.isArray(row)) {
-          container.appendChild(createRowBlock('', row));
-        } else if (row && typeof row === 'object') {
-          if (typeof row.spacer === 'number') {
-            const spacer = document.createElement('div');
-            spacer.className = 'grid-spacer';
-            spacer.style.height = `${row.spacer}px`;
-            container.appendChild(spacer);
-          } else if (Array.isArray(row.items)) {
-            const title = row.title || (row.folder ? formatRowTitle(row.folder) : '');
-            container.appendChild(createRowBlock(title, row.items));
-          }
+          row.forEach(item => {
+            const element = createGridItem(item);
+            if (element) {
+              grid.appendChild(element);
+            }
+          });
+        } else if (row && typeof row.spacer === 'number') {
+          const spacer = document.createElement('div');
+          spacer.className = 'grid-spacer';
+          spacer.style.height = `${row.spacer}px`;
+          grid.appendChild(spacer);
         }
       });
-      return container;
-    }
-
-    function openLightbox({ type, src, alt = '', poster = '' }) {
-      if (!src) return;
-      lastFocusedElement = document.activeElement;
-      const focusTarget = lightbox;
-      const mediaIsVideo = type === 'video';
-
-      const existingVideo = lightboxMedia.querySelector('video');
-      if (existingVideo) {
-        existingVideo.pause();
-      }
-      lightboxMedia.innerHTML = '';
-
-      let element;
-      if (mediaIsVideo) {
-        element = document.createElement('video');
-        element.controls = true;
-        element.src = src;
-        element.preload = 'auto';
-        if (poster) {
-          element.poster = poster;
-        }
-      } else {
-        element = document.createElement('img');
-        element.src = src;
-        element.alt = alt;
-        element.loading = 'lazy';
-      }
-
-      lightboxMedia.appendChild(element);
-      lightbox.classList.add('is-active');
-      lightbox.setAttribute('aria-hidden', 'false');
-      focusTarget.focus({ preventScroll: true });
-
-      if (mediaIsVideo) {
-        element.play().catch(() => {});
-      }
-    }
-
-    function closeLightbox() {
-      if (!lightbox.classList.contains('is-active')) return;
-      const activeVideo = lightboxMedia.querySelector('video');
-      if (activeVideo) {
-        activeVideo.pause();
-      }
-      lightboxMedia.innerHTML = '';
-      lightbox.classList.remove('is-active');
-      lightbox.setAttribute('aria-hidden', 'true');
-      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-        lastFocusedElement.focus({ preventScroll: true });
-      }
+      return grid;
     }
 
     async function renderSubsection(target) {
-      closeLightbox();
       document.body.classList.add('is-subpage');
       const { section, subsection } = target;
       setActivePrimary(section.id);
@@ -794,35 +590,6 @@
         renderHome();
       }
     }
-
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', event => {
-      if (event.target === lightbox) {
-        closeLightbox();
-      }
-    });
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        closeLightbox();
-      }
-    });
-
-    document.addEventListener('click', event => {
-      const trigger = event.target.closest('[data-lightbox-type]');
-      if (!trigger) return;
-      const type = trigger.dataset.lightboxType;
-      if (!['image', 'video'].includes(type)) return;
-      const src = trigger.dataset.lightboxSrc;
-      if (!src) return;
-      event.preventDefault();
-      openLightbox({
-        type,
-        src,
-        alt: trigger.dataset.lightboxAlt || '',
-        poster: trigger.dataset.lightboxPoster || ''
-      });
-    });
 
     document.getElementById('home-button').addEventListener('click', () => {
       window.location.hash = '';
