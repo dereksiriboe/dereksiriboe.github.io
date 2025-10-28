@@ -1,6 +1,4 @@
-# Derek Siriboe — Minimalist Portfolio
-
-A single-page portfolio inspired by [antosh.ca/work](https://antosh.ca/work). All content is driven by JSON files so new work can be published without touching the HTML.
+# Derek Siriboe —  Portfolio
 
 ## 📁 Repository Layout
 ```
