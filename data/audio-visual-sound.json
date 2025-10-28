@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "folder": "mixes-and-playlists",
+      "items": [
+        {"type": "audio", "file": "https://samplelib.com/lib/preview/mp3/sample-3s.mp3", "title": "Analog Warmth", "size": "wide"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"type": "spotify", "url": "https://open.spotify.com/album/1ATL5GLyefJaxhQzSPVrLX", "size": "large"}
+      ]
+    },
+    {
+      "folder": "live-references",
+      "items": [
+        {"type": "youtube", "videoId": "tAGnKpE4NCI", "thumbnail": "auto", "size": "large"},
+        {"type": "audio", "file": "https://samplelib.com/lib/preview/mp3/sample-6s.mp3", "title": "Studio Loop", "size": "medium"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"}
+      ]
+    },
+    {"spacer": 60},
+    {
+      "folder": "process-stills",
+      "items": [
+        {"file": "images/photo/fun/fun-001.jpg", "alt": "Sound board", "size": "medium"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/photo/project/photo-proj-003.jpg", "alt": "Studio detail", "size": "medium"}
+      ]
+    }
+  ]
+}
