@@ -1,29 +1,20 @@
 {
   "rows": [
-    {
-      "folder": "short-form-edits",
-      "items": [
-        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/photo/project/photo-proj-001.jpg", "size": "wide"},
-        {"type": "accent", "color": "#FF6B35", "size": "small"},
-        {"type": "youtube", "videoId": "ScMzIvxBSi4", "thumbnail": "auto", "size": "large"}
-      ]
-    },
-    {
-      "folder": "bts-stills",
-      "items": [
-        {"file": "images/photo/project/photo-proj-002.jpg", "alt": "Project behind the scenes", "size": "medium"},
-        {"type": "accent", "color": "#FF6B35", "size": "small"},
-        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/photo/project/photo-proj-003.jpg", "size": "large"}
-      ]
-    },
+    [
+      {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/photo/project/photo-proj-001.jpg", "size": "wide"},
+      {"type": "accent", "color": "#FF6B35", "size": "small"},
+      {"type": "youtube", "videoId": "ScMzIvxBSi4", "thumbnail": "auto", "size": "large"}
+    ],
+    [
+      {"file": "images/photo/project/photo-proj-002.jpg", "alt": "Project behind the scenes", "size": "medium"},
+      {"type": "accent", "color": "#FF6B35", "size": "small"},
+      {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/photo/project/photo-proj-003.jpg", "size": "large"}
+    ],
     {"spacer": 60},
-    {
-      "folder": "soundscapes",
-      "items": [
-        {"type": "spotify", "url": "https://open.spotify.com/track/0ofHAoxe9vBkTCp2UQIavz", "size": "wide"},
-        {"type": "accent", "color": "#FF6B35", "size": "small"},
-        {"file": "images/photo/fun/fun-002.jpg", "alt": "Color grading reference", "size": "medium"}
-      ]
-    }
+    [
+      {"type": "spotify", "url": "https://open.spotify.com/track/0ofHAoxe9vBkTCp2UQIavz", "size": "wide"},
+      {"type": "accent", "color": "#FF6B35", "size": "small"},
+      {"file": "images/photo/fun/fun-002.jpg", "alt": "Color grading reference", "size": "medium"}
+    ]
   ]
 }
