@@ -1,223 +1,836 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Derek Siriboe</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Derek Siriboe — Portfolio</title>
+  <link rel="icon" href="favicon.ico">
   <style>
-    :root{ --fg:#000; --muted:#666; --max:1200px; }
-    *{ box-sizing:border-box; margin:0; padding:0 }
-    html,body{ background:#fff; color:var(--fg);
-      font:16px/1.6 'Helvetica Neue', Arial, system-ui, -apple-system, sans-serif; }
-
-    /* layout */
-    .container{ max-width:var(--max); margin:0 auto; padding:40px; min-height:100vh; }
-    .header{ margin-bottom:40px; cursor:pointer; }
-    .name{ font-size:18px; font-weight:500; }
-    .location,.email{ font-size:16px; color:var(--muted); }
-    .email a{ color:inherit; text-decoration:none }
-    .email a:hover{ text-decoration:underline }
-
-    .nav{ margin-top:24px }
-    .nav a{ text-decoration:underline; margin-right:20px; color:var(--fg) }
-
-    .hero-image{ margin:40px 0; text-align:center }
-    .hero-image img{ max-width:100%; height:auto; max-height:60vh; object-fit:cover }
-
-    /* sections */
-    .section{ display:none }
-    .image-grid{ margin-top:40px }
-    .image-row{ display:flex; gap:10px; margin-bottom:10px; align-items:flex-start }
-    .image-item{ background:#eee; border-radius:4px; overflow:hidden }
-    .image-item img{ width:100%; height:100%; object-fit:cover; display:block }
-
-    /* variety sizes */
-    .small{ width:80px; height:80px }
-    .medium{ width:120px; height:80px }
-    .large{ width:160px; height:80px }
-    .tall{ width:80px; height:120px }
-    .wide{ width:200px; height:80px }
-
-    .spacer{ height:60px }
-
-    /* sticky banner on subpages */
-    .banner{ position:sticky; top:0; background:#fff; z-index:2; border-bottom:1px solid #eee }
-    .banner .inner{ max-width:var(--max); margin:0 auto; padding:24px 40px }
-
-    /* responsive */
-    @media (max-width:768px){
-      .container{ padding:22px 16px }
-      .banner .inner{ padding:18px 16px }
-      .small{ width:60px; height:60px }
-      .medium{ width:90px; height:60px }
-      .large{ width:120px; height:60px }
-      .tall{ width:60px; height:90px }
-      .wide{ width:140px; height:60px }
-      .spacer{ height:40px }
+    :root {
+      --primary-bg: #ffffff;
+      --primary-fg: #000000;
+      --muted: #666666;
+      --accent-orange: #FF6B35;
+      --max-width: 1200px;
+      --gutter: 10px;
     }
-    @media (max-width:480px){
-      .small{ width:50px; height:50px }
-      .medium{ width:75px; height:50px }
-      .large{ width:100px; height:50px }
-      .tall{ width:50px; height:75px }
-      .wide{ width:120px; height:50px }
-      .spacer{ height:30px }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--primary-bg);
+      color: var(--primary-fg);
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .site-wrapper {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    .site-header {
+      margin-bottom: 40px;
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .site-header button {
+      border: none;
+      background: transparent;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .site-header .name {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    .site-header .location,
+    .site-header .email {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .site-header .email a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-header .email a:hover {
+      text-decoration: underline;
+    }
+
+    body.is-subpage .site-header {
+      position: sticky;
+      top: 0;
+      background: var(--primary-bg);
+      padding-bottom: 16px;
+      z-index: 20;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    body.is-subpage .site-wrapper {
+      padding-top: 24px;
+    }
+
+    .primary-nav,
+    .sub-nav {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .primary-nav a,
+    .sub-nav a {
+      text-decoration: none;
+      color: var(--primary-fg);
+      font-size: 16px;
+      position: relative;
+    }
+
+    .primary-nav a::after,
+    .sub-nav a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 100%;
+      height: 1px;
+      background: transparent;
+      transition: background 0.2s ease;
+    }
+
+    .primary-nav a:hover::after,
+    .sub-nav a:hover::after,
+    .primary-nav a.is-active::after,
+    .sub-nav a.is-active::after {
+      background: var(--primary-fg);
+    }
+
+    .content {
+      display: block;
+      width: 100%;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--gutter);
+      align-items: flex-start;
+    }
+
+    .grid-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      width: 100%;
+    }
+
+    .row-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .row-title {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .grid-spacer {
+      width: 100%;
+      height: 40px;
+      flex: 0 0 auto;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 200;
+    }
+
+    .lightbox.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      gap: 16px;
+    }
+
+    .lightbox-content img,
+    .lightbox-content video {
+      max-width: 100%;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-close:hover,
+    .lightbox-close:focus {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    .grid-item {
+      background: #f5f5f5;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-item img,
+    .grid-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .grid-item iframe {
+      border: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .grid-item audio {
+      width: 100%;
+      height: 40px;
+    }
+
+    .grid-item.youtube {
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      flex-direction: column;
+    }
+
+    .grid-item.youtube img {
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .grid-item.youtube:hover img {
+      opacity: 1;
+    }
+
+    .grid-item.youtube .play-badge {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-item.youtube .play-badge::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 10px solid #fff;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      margin-left: 2px;
+    }
+
+    .accent-block {
+      background: var(--accent-orange);
+    }
+
+    .grid-spacer {
+      flex-basis: 100%;
+      height: 60px;
+    }
+
+    .small { width: 80px; height: 80px; }
+    .medium { width: 120px; height: 80px; }
+    .large { width: 160px; height: 80px; }
+    .tall { width: 80px; height: 120px; }
+    .wide { width: 200px; height: 80px; }
+
+    .hero-grid {
+      margin-top: 40px;
+    }
+
+    .home-description {
+      max-width: 520px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .site-wrapper {
+        padding: 32px 24px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .site-wrapper {
+        padding: 24px 16px;
+      }
+
+      .primary-nav,
+      .sub-nav {
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .small { width: 70px; height: 70px; }
+      .medium { width: 100px; height: 70px; }
+      .large { width: 140px; height: 70px; }
+      .tall { width: 70px; height: 100px; }
+      .wide { width: 160px; height: 70px; }
+      .grid-spacer { height: 40px; }
+    }
+
+    @media (max-width: 520px) {
+      .site-wrapper {
+        padding: 16px;
+      }
+
+      .site-header {
+        margin-bottom: 32px;
+      }
+
+      .small { width: 60px; height: 60px; }
+      .medium { width: 90px; height: 60px; }
+      .large { width: 120px; height: 60px; }
+      .tall { width: 60px; height: 90px; }
+      .wide { width: 140px; height: 60px; }
+      .grid-spacer { height: 30px; }
     }
   </style>
 </head>
 <body>
-  <div class="container" id="home">
-    <!-- Home -->
-    <div class="main-content" id="main-content">
-      <div class="header" data-home>
-        <div class="name">Derek Siriboe</div>
-        <div class="location">New York, NY</div>
-        <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
-      </div>
+  <div class="site-wrapper">
+    <header class="site-header" id="site-header">
+      <button type="button" id="home-button" aria-label="Return to homepage">
+        <span class="name">Derek Siriboe</span>
+        <span class="location">New York, NY</span>
+        <span class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></span>
+      </button>
+    </header>
 
-      <div class="hero-image">
-        <img id="hero-img" alt="Derek Siriboe" style="display:none">
-      </div>
+    <nav class="primary-nav" id="primary-nav" aria-label="Primary">
+      <!-- populated by script -->
+    </nav>
 
-      <nav class="nav">
-        <a href="#leisure">leisure</a>
-        <a href="#project">project</a>
-      </nav>
-    </div>
+    <div id="sub-nav-container"></div>
 
-    <!-- Leisure -->
-    <div class="section" id="leisure-section">
-      <header class="banner" data-home>
-        <div class="inner">
-          <div class="name">Derek Siriboe</div>
-          <div class="location">New York, NY</div>
-          <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
-        </div>
-      </header>
-      <main class="image-grid" id="leisure-grid"></main>
-    </div>
+    <main class="content" id="content" role="main"></main>
+  </div>
 
-    <!-- Project -->
-    <div class="section" id="project-section">
-      <header class="banner" data-home>
-        <div class="inner">
-          <div class="name">Derek Siriboe</div>
-          <div class="location">New York, NY</div>
-          <div class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></div>
-        </div>
-      </header>
-      <main class="image-grid" id="project-grid"></main>
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+    <div class="lightbox-content">
+      <button type="button" class="lightbox-close" aria-label="Close preview">&times;</button>
+      <div id="lightbox-media"></div>
     </div>
   </div>
 
+  <template id="home-template">
+    <section class="home-view" aria-label="Featured work">
+      <p class="home-description">
+        Minimal commissions and ongoing experiments across style, photo, and audio-visual practice.
+      </p>
+      <div class="grid hero-grid">
+        <div class="grid-item wide" data-lightbox-type="image" data-lightbox-src="images/style/project/lookbook-series/look-001.svg" data-lightbox-alt="Editorial lookbook pose"><img src="images/style/project/lookbook-series/look-001.svg" alt="Editorial lookbook pose" loading="lazy"></div>
+        <div class="grid-item small accent-block" aria-hidden="true"></div>
+        <div class="grid-item tall" data-lightbox-type="image" data-lightbox-src="images/style/private-client/feature-lookbook/look-001.svg" data-lightbox-alt="Private client portrait"><img src="images/style/private-client/feature-lookbook/look-001.svg" alt="Private client portrait" loading="lazy"></div>
+        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/photo/fun/travel-diaries/travel-001.svg" data-lightbox-alt="Road trip snapshot"><img src="images/photo/fun/travel-diaries/travel-001.svg" alt="Road trip snapshot" loading="lazy"></div>
+        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/photo/project/campaign-portraits/portrait-001.svg" data-lightbox-alt="Brand shoot portrait"><img src="images/photo/project/campaign-portraits/portrait-001.svg" alt="Brand shoot portrait" loading="lazy"></div>
+        <div class="grid-item small accent-block" aria-hidden="true"></div>
+        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/style/project/studio-energy/still-001.svg" data-lightbox-alt="Studio lighting experiment"><img src="images/style/project/studio-energy/still-001.svg" alt="Studio lighting experiment" loading="lazy"></div>
+        <div class="grid-item wide" data-lightbox-type="image" data-lightbox-src="images/photo/fun/travel-diaries/travel-002.svg" data-lightbox-alt="Sunset over water"><img src="images/photo/fun/travel-diaries/travel-002.svg" alt="Sunset over water" loading="lazy"></div>
+        <div class="grid-item tall" data-lightbox-type="image" data-lightbox-src="images/photo/project/campaign-portraits/portrait-002.svg" data-lightbox-alt="Product detail"><img src="images/photo/project/campaign-portraits/portrait-002.svg" alt="Product detail" loading="lazy"></div>
+        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/style/private-client/feature-lookbook/look-002.svg" data-lightbox-alt="Client posing in studio"><img src="images/style/private-client/feature-lookbook/look-002.svg" alt="Client posing in studio" loading="lazy"></div>
+        <div class="grid-item small accent-block" aria-hidden="true"></div>
+        <div class="grid-item large" data-lightbox-type="image" data-lightbox-src="images/style/private-client/studio-motion/still-001.svg" data-lightbox-alt="Editorial-style portrait"><img src="images/style/private-client/studio-motion/still-001.svg" alt="Editorial-style portrait" loading="lazy"></div>
+        <div class="grid-item medium" data-lightbox-type="image" data-lightbox-src="images/photo/fun/street-notes/street-001.svg" data-lightbox-alt="Candid street scene"><img src="images/photo/fun/street-notes/street-001.svg" alt="Candid street scene" loading="lazy"></div>
+      </div>
+    </section>
+  </template>
+
+  <template id="loading-template">
+    <div style="padding:40px 0; color: var(--muted);">Loading content…</div>
+  </template>
+
+  <template id="error-template">
+    <div style="padding:40px 0; color: var(--muted);">Content unavailable. Please try again later.</div>
+  </template>
+
   <script>
-    /* --- Optional hero image auto-detect --- */
-    function loadHeroImage(){
-      const hero = document.getElementById('hero-img');
-      const candidates = [
-        'images/hero.jpg','images/hero.jpeg','images/hero.png','images/hero.webp',
-        'images/profile.jpg','images/profile.jpeg','images/profile.png'
-      ];
-      for (const p of candidates){
-        const test = new Image();
-        test.onload = ()=>{ if (!hero.src){ hero.src=p; hero.style.display='block'; } };
-        test.src = p;
+    const sectionConfig = [
+      {
+        id: 'style',
+        label: 'style',
+        defaultSubsection: 'style-private-client',
+        subsections: [
+          { id: 'style-private-client', label: 'private-client', data: 'data/style-private-client.json' },
+          { id: 'style-project', label: 'project', data: 'data/style-project.json' }
+        ]
+      },
+      {
+        id: 'photo',
+        label: 'photo',
+        defaultSubsection: 'photo-fun',
+        subsections: [
+          { id: 'photo-fun', label: 'fun', data: 'data/photo-fun.json' },
+          { id: 'photo-project', label: 'project', data: 'data/photo-project.json' }
+        ]
+      },
+      {
+        id: 'audio-visual',
+        label: 'audio-visual',
+        defaultSubsection: 'audio-visual-sound',
+        subsections: [
+          { id: 'audio-visual-sound', label: 'sound', data: 'data/audio-visual-sound.json' },
+          { id: 'audio-visual-video', label: 'video', data: 'data/audio-visual-video.json' }
+        ]
+      },
+      {
+        id: 'design',
+        label: 'design',
+        defaultSubsection: 'design-garment',
+        subsections: [
+          { id: 'design-garment', label: 'garment', data: 'data/design-garment.json' },
+          { id: 'design-ui-ux', label: 'ui-ux', data: 'data/design-ui-ux.json' }
+        ]
       }
+    ];
+
+    const subsectionLookup = new Map();
+    sectionConfig.forEach(section => {
+      section.subsections.forEach(sub => {
+        subsectionLookup.set(sub.id, { section, subsection: sub });
+      });
+    });
+
+    const dataCache = new Map();
+
+    const primaryNav = document.getElementById('primary-nav');
+    const subNavContainer = document.getElementById('sub-nav-container');
+    const content = document.getElementById('content');
+    const homeTemplate = document.getElementById('home-template');
+    const loadingTemplate = document.getElementById('loading-template');
+    const errorTemplate = document.getElementById('error-template');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxMedia = document.getElementById('lightbox-media');
+    const lightboxClose = lightbox.querySelector('.lightbox-close');
+    let lastFocusedElement = null;
+
+    function buildPrimaryNav() {
+      primaryNav.innerHTML = '';
+      sectionConfig.forEach(section => {
+        const link = document.createElement('a');
+        link.href = `#${section.defaultSubsection}`;
+        link.textContent = section.label;
+        link.dataset.section = section.id;
+        primaryNav.appendChild(link);
+      });
     }
 
-    /* --- JSON rows renderer --- */
-    const sizeClasses = ['small','medium','large','tall','wide'];
+    function setActivePrimary(sectionId) {
+      primaryNav.querySelectorAll('a').forEach(anchor => {
+        anchor.classList.toggle('is-active', anchor.dataset.section === sectionId);
+      });
+    }
 
-    async function renderRows(jsonPath, mountId){
-      const mount = document.getElementById(mountId);
-      mount.innerHTML = '<div class="loading" style="color:#999;padding:40px;text-align:center">Loading images…</div>';
-      try{
-        const data = await (await fetch(jsonPath, {cache:'no-store'})).json();
-        mount.innerHTML = '';
-        let counter = 0;
+    function renderHome() {
+      document.body.classList.remove('is-subpage');
+      closeLightbox();
+      setActivePrimary(null);
+      subNavContainer.innerHTML = '';
+      content.innerHTML = '';
+      content.appendChild(homeTemplate.content.cloneNode(true));
+    }
 
-        for (const row of data.rows){
-          if (row.spacer){
-            const s = document.createElement('div');
-            s.className = 'spacer';
-            s.style.height = (row.spacer + 'px');
-            mount.appendChild(s);
-            continue;
+    function renderSubNav(section, activeSubId) {
+      subNavContainer.innerHTML = '';
+      const nav = document.createElement('nav');
+      nav.className = 'sub-nav';
+      nav.setAttribute('aria-label', `${section.label} subsections`);
+      section.subsections.forEach(sub => {
+        const link = document.createElement('a');
+        link.href = `#${sub.id}`;
+        link.textContent = sub.label;
+        if (sub.id === activeSubId) {
+          link.classList.add('is-active');
+        }
+        nav.appendChild(link);
+      });
+      subNavContainer.appendChild(nav);
+    }
+
+    async function loadSubsectionData(subsection) {
+      if (dataCache.has(subsection.id)) {
+        return dataCache.get(subsection.id);
+      }
+      const response = await fetch(subsection.data, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Failed to load ${subsection.data}`);
+      }
+      const json = await response.json();
+      dataCache.set(subsection.id, json);
+      return json;
+    }
+
+    function createGridItem(item) {
+      if (Array.isArray(item)) {
+        console.warn('Unexpected array item', item);
+        return null;
+      }
+
+      const normalized = { ...item };
+      if (!normalized.type && normalized.file) {
+        const ext = normalized.file.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'bmp', 'svg'].includes(ext)) {
+          normalized.type = 'image';
+        } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
+          normalized.type = 'audio';
+        } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+          normalized.type = 'video';
+        }
+      }
+
+      const sizeClass = ['small','medium','large','tall','wide'].includes(normalized.size) ? normalized.size : 'medium';
+      const wrapper = document.createElement('div');
+      wrapper.className = `grid-item ${sizeClass}`;
+
+      switch (normalized.type) {
+        case 'accent': {
+          wrapper.classList.add('accent-block');
+          if (normalized.color) {
+            wrapper.style.background = normalized.color;
           }
-          const line = document.createElement('div');
-          line.className = 'image-row';
-
-          row.forEach((item, i) => {
-            const obj = (typeof item === 'string') ? {file:item} : item;
-            const cell = document.createElement('div');
-            cell.className = `image-item ${sizeClasses[(counter+i)%sizeClasses.length]}`;
-
+          wrapper.setAttribute('aria-hidden', 'true');
+          break;
+        }
+        case 'youtube': {
+          const videoId = normalized.videoId || '';
+          const thumbnail = normalized.thumbnail === 'auto' && videoId
+            ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+            : normalized.thumbnail;
+          const link = document.createElement('a');
+          link.href = `https://www.youtube.com/watch?v=${videoId}`;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.className = 'grid-item youtube';
+          link.classList.add(sizeClass);
+          if (thumbnail) {
             const img = document.createElement('img');
             img.loading = 'lazy';
-            img.src = obj.file;
-            img.alt = (obj.alt || obj.file.split('/').pop().replace(/\.[^.]+$/,'').replace(/[-_]/g,' '));
-
-            if (obj.href){
-              const link = document.createElement('a');
-              link.href = obj.href; link.target = '_blank'; link.rel = 'noopener';
-              link.appendChild(img); cell.appendChild(link);
-            }else{
-              cell.appendChild(img);
-            }
-            line.appendChild(cell);
-          });
-
-          mount.appendChild(line);
-          counter += row.length || 1;
+            img.alt = normalized.alt || 'YouTube preview';
+            img.src = thumbnail;
+            link.appendChild(img);
+          }
+          const badge = document.createElement('span');
+          badge.className = 'play-badge';
+          link.appendChild(badge);
+          return link;
         }
-
-        if (!mount.children.length){
-          mount.innerHTML = '<div style="color:#999;padding:40px;text-align:center">No images found.</div>';
+        case 'spotify': {
+          const iframe = document.createElement('iframe');
+          iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+          iframe.loading = 'lazy';
+          iframe.src = buildSpotifyEmbedUrl(normalized.url);
+          wrapper.appendChild(iframe);
+          break;
         }
-      }catch(err){
-        console.error(err);
-        mount.innerHTML = '<div style="color:#999;padding:40px;text-align:center">Could not load gallery.</div>';
+        case 'audio': {
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.preload = 'metadata';
+          audio.src = normalized.file;
+          if (normalized.title) {
+            audio.title = normalized.title;
+          }
+          wrapper.appendChild(audio);
+          break;
+        }
+        case 'video': {
+          const video = document.createElement('video');
+          video.controls = true;
+          video.preload = 'metadata';
+          video.src = normalized.file;
+          if (normalized.poster) {
+            video.poster = normalized.poster;
+          }
+          wrapper.appendChild(video);
+          wrapper.dataset.lightboxType = 'video';
+          wrapper.dataset.lightboxSrc = normalized.file;
+          if (normalized.poster) {
+            wrapper.dataset.lightboxPoster = normalized.poster;
+          }
+          break;
+        }
+        default: {
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.src = normalized.file;
+          const altText = normalized.alt || deriveAlt(normalized.file);
+          img.alt = altText;
+          wrapper.appendChild(img);
+          wrapper.dataset.lightboxType = 'image';
+          wrapper.dataset.lightboxSrc = normalized.file;
+          wrapper.dataset.lightboxAlt = altText;
+        }
+      }
+
+      return wrapper;
+    }
+
+    function buildSpotifyEmbedUrl(url) {
+      if (!url) return '';
+      try {
+        const parsed = new URL(url);
+        parsed.pathname = '/embed' + parsed.pathname;
+        if (!parsed.search) {
+          parsed.search = '?utm_source=generator';
+        }
+        return parsed.toString();
+      } catch (error) {
+        console.warn('Invalid Spotify URL', url);
+        return url;
       }
     }
 
-    /* --- Simple hash router (so Back/Forward works) --- */
-    function showHome(){
-      document.getElementById('main-content').style.display = 'block';
-      document.getElementById('leisure-section').style.display = 'none';
-      document.getElementById('project-section').style.display = 'none';
-    }
-    async function showLeisure(){
-      document.getElementById('main-content').style.display = 'none';
-      document.getElementById('project-section').style.display = 'none';
-      document.getElementById('leisure-section').style.display = 'block';
-      await renderRows('data/leisure.json', 'leisure-grid');
-    }
-    async function showProject(){
-      document.getElementById('main-content').style.display = 'none';
-      document.getElementById('leisure-section').style.display = 'none';
-      document.getElementById('project-section').style.display = 'block';
-      await renderRows('data/project.json', 'project-grid');
-    }
-    function route(){
-      const h = location.hash.replace('#','');
-      if (h === 'leisure') return showLeisure();
-      if (h === 'project') return showProject();
-      return showHome();
+    function deriveAlt(path) {
+      return path.split('/').pop().split('.').shift().replace(/[-_]/g, ' ');
     }
 
-    /* click banner to return home */
-    document.addEventListener('click', (e)=>{
-      if (e.target.closest('[data-home]') && document.getElementById('main-content').style.display === 'none'){
-        location.hash = '';
+    function formatRowTitle(value = '') {
+      return value
+        .split('/')
+        .pop()
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    function createRowBlock(title, items) {
+      const rowSection = document.createElement('section');
+      rowSection.className = 'row-block';
+
+      if (title) {
+        const heading = document.createElement('h2');
+        heading.className = 'row-title';
+        heading.textContent = title;
+        rowSection.appendChild(heading);
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+      items.forEach(item => {
+        const element = createGridItem(item);
+        if (element) {
+          grid.appendChild(element);
+        }
+      });
+
+      rowSection.appendChild(grid);
+      return rowSection;
+    }
+
+    function renderGrid(rows) {
+      const container = document.createElement('div');
+      container.className = 'grid-rows';
+      rows.forEach(row => {
+        if (Array.isArray(row)) {
+          container.appendChild(createRowBlock('', row));
+        } else if (row && typeof row === 'object') {
+          if (typeof row.spacer === 'number') {
+            const spacer = document.createElement('div');
+            spacer.className = 'grid-spacer';
+            spacer.style.height = `${row.spacer}px`;
+            container.appendChild(spacer);
+          } else if (Array.isArray(row.items)) {
+            const title = row.title || (row.folder ? formatRowTitle(row.folder) : '');
+            container.appendChild(createRowBlock(title, row.items));
+          }
+        }
+      });
+      return container;
+    }
+
+    function openLightbox({ type, src, alt = '', poster = '' }) {
+      if (!src) return;
+      lastFocusedElement = document.activeElement;
+      const focusTarget = lightbox;
+      const mediaIsVideo = type === 'video';
+
+      const existingVideo = lightboxMedia.querySelector('video');
+      if (existingVideo) {
+        existingVideo.pause();
+      }
+      lightboxMedia.innerHTML = '';
+
+      let element;
+      if (mediaIsVideo) {
+        element = document.createElement('video');
+        element.controls = true;
+        element.src = src;
+        element.preload = 'auto';
+        if (poster) {
+          element.poster = poster;
+        }
+      } else {
+        element = document.createElement('img');
+        element.src = src;
+        element.alt = alt;
+        element.loading = 'lazy';
+      }
+
+      lightboxMedia.appendChild(element);
+      lightbox.classList.add('is-active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      focusTarget.focus({ preventScroll: true });
+
+      if (mediaIsVideo) {
+        element.play().catch(() => {});
+      }
+    }
+
+    function closeLightbox() {
+      if (!lightbox.classList.contains('is-active')) return;
+      const activeVideo = lightboxMedia.querySelector('video');
+      if (activeVideo) {
+        activeVideo.pause();
+      }
+      lightboxMedia.innerHTML = '';
+      lightbox.classList.remove('is-active');
+      lightbox.setAttribute('aria-hidden', 'true');
+      if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus({ preventScroll: true });
+      }
+    }
+
+    async function renderSubsection(target) {
+      closeLightbox();
+      document.body.classList.add('is-subpage');
+      const { section, subsection } = target;
+      setActivePrimary(section.id);
+      renderSubNav(section, subsection.id);
+      content.innerHTML = '';
+      content.appendChild(loadingTemplate.content.cloneNode(true));
+      try {
+        const data = await loadSubsectionData(subsection);
+        content.innerHTML = '';
+        content.appendChild(renderGrid(data.rows || []));
+      } catch (error) {
+        console.error(error);
+        content.innerHTML = '';
+        content.appendChild(errorTemplate.content.cloneNode(true));
+      }
+    }
+
+    function handleRoute() {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (!hash) {
+        renderHome();
+        return;
+      }
+      const target = subsectionLookup.get(hash);
+      if (target) {
+        renderSubsection(target);
+      } else {
+        renderHome();
+      }
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', event => {
+      if (event.target === lightbox) {
+        closeLightbox();
       }
     });
 
-    window.addEventListener('hashchange', route);
-    document.addEventListener('DOMContentLoaded', () => { loadHeroImage(); route(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener('click', event => {
+      const trigger = event.target.closest('[data-lightbox-type]');
+      if (!trigger) return;
+      const type = trigger.dataset.lightboxType;
+      if (!['image', 'video'].includes(type)) return;
+      const src = trigger.dataset.lightboxSrc;
+      if (!src) return;
+      event.preventDefault();
+      openLightbox({
+        type,
+        src,
+        alt: trigger.dataset.lightboxAlt || '',
+        poster: trigger.dataset.lightboxPoster || ''
+      });
+    });
+
+    document.getElementById('home-button').addEventListener('click', () => {
+      window.location.hash = '';
+    });
+
+    buildPrimaryNav();
+    window.addEventListener('hashchange', handleRoute);
+    handleRoute();
   </script>
 </body>
 </html>

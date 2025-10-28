@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "folder": "images/audio-visual/video/short-form-edits",
+      "items": [
+        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/audio-visual/video/short-form-edits/poster.svg", "size": "wide"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"type": "youtube", "videoId": "ScMzIvxBSi4", "thumbnail": "auto", "size": "large"}
+      ]
+    },
+    {
+      "folder": "images/audio-visual/video/bts-stills",
+      "items": [
+        {"file": "images/audio-visual/video/bts-stills/frame-001.svg", "alt": "Project behind the scenes", "size": "medium"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/audio-visual/video/bts-stills/poster.svg", "size": "large"}
+      ]
+    },
+    {"spacer": 60},
+    {
+      "folder": "images/audio-visual/video/soundscapes",
+      "items": [
+        {"type": "spotify", "url": "https://open.spotify.com/track/0ofHAoxe9vBkTCp2UQIavz", "size": "wide"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/audio-visual/video/soundscapes/mood-001.svg", "alt": "Color grading reference", "size": "medium"}
+      ]
+    }
+  ]
+}

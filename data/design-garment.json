@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "folder": "images/design/garment/drape-tests",
+      "items": [
+        {"file": "images/design/garment/drape-tests/look-001.svg", "alt": "Garment study board", "size": "large"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/design/garment/drape-tests/look-002.svg", "alt": "Pattern draft poster", "size": "medium"}
+      ]
+    },
+    {
+      "folder": "images/design/garment/material-motion",
+      "items": [
+        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/design/garment/material-motion/poster.svg", "size": "wide"},
+        {"file": "images/design/garment/material-motion/fabric-001.svg", "alt": "Fabric detail", "size": "small"},
+        {"type": "accent", "color": "#FF6B35", "size": "medium"}
+      ]
+    },
+    {"spacer": 60},
+    {
+      "folder": "images/design/garment/runway-sound",
+      "items": [
+        {"type": "audio", "file": "https://samplelib.com/lib/preview/mp3/sample-9s.mp3", "title": "Show Mix", "size": "wide"},
+        {"file": "images/design/garment/runway-sound/runway-001.svg", "alt": "Runway snapshot", "size": "medium"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "rows": [
+    {
+      "folder": "images/photo/project/campaign-portraits",
+      "items": [
+        {"file": "images/photo/project/campaign-portraits/portrait-001.svg", "alt": "Brand shoot portrait", "size": "large"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/photo/project/campaign-portraits/portrait-002.svg", "alt": "Product detail", "size": "medium"}
+      ]
+    },
+    {
+      "folder": "images/photo/project/lifestyle-motion",
+      "items": [
+        {"file": "images/photo/project/lifestyle-motion/motion-001.svg", "alt": "Outdoor lifestyle", "size": "wide"},
+        {"type": "youtube", "videoId": "60ItHLz5WEA", "thumbnail": "auto", "size": "large"}
+      ]
+    },
+    {
+      "folder": "images/photo/project/set-details",
+      "items": [
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/photo/project/set-details/set-001.svg", "alt": "Studio still life", "size": "tall"},
+        {"file": "images/photo/project/set-details/set-002.svg", "alt": "Creative team", "size": "medium"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "folder": "images/photo/fun/travel-diaries",
+      "items": [
+        {"file": "images/photo/fun/travel-diaries/travel-001.svg", "alt": "Road trip snapshot", "size": "medium"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/photo/fun/travel-diaries/travel-002.svg", "alt": "Sunset over water", "size": "large"}
+      ]
+    },
+    {
+      "folder": "images/photo/fun/street-notes",
+      "items": [
+        {"file": "images/photo/fun/street-notes/street-001.svg", "alt": "Candid street scene", "size": "wide"},
+        {"type": "youtube", "videoId": "ktvTqknDobU", "thumbnail": "auto", "size": "large"}
+      ]
+    },
+    {"spacer": 60},
+    {
+      "folder": "images/photo/fun/studio-details",
+      "items": [
+        {"file": "images/photo/fun/studio-details/studio-001.svg", "alt": "Studio plant detail", "size": "tall"},
+        {"file": "images/photo/fun/studio-details/studio-002.svg", "alt": "Architecture study", "size": "medium"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"}
+      ]
+    }
+  ]
+}

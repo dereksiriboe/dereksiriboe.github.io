@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "folder": "images/style/project/lookbook-series",
+      "items": [
+        {"file": "images/style/project/lookbook-series/look-001.svg", "alt": "Editorial lookbook pose", "size": "wide"},
+        {"file": "images/style/project/lookbook-series/look-002.svg", "alt": "Fashion detail shot", "size": "small"},
+        {"type": "accent", "color": "#FF6B35", "size": "medium"}
+      ]
+    },
+    {
+      "folder": "images/style/project/studio-energy",
+      "items": [
+        {"type": "youtube", "videoId": "5NV6Rdv1a3I", "thumbnail": "auto", "size": "large"},
+        {"file": "images/style/project/studio-energy/still-001.svg", "alt": "Studio lighting experiment", "size": "tall"},
+        {"file": "images/style/project/studio-energy/still-002.svg", "alt": "Runway finale", "size": "medium"}
+      ]
+    },
+    {
+      "folder": "images/style/project/soundtrack",
+      "items": [
+        {"type": "spotify", "url": "https://open.spotify.com/playlist/37i9dQZF1DX1clOuib1KtQ", "size": "wide"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/style/project/soundtrack/detail-001.svg", "alt": "Editorial beauty portrait", "size": "large"}
+      ]
+    }
+  ]
+}

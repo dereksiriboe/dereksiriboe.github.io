@@ -1,0 +1,27 @@
+{
+  "rows": [
+    {
+      "folder": "images/design/ui-ux/wireframes",
+      "items": [
+        {"file": "images/design/ui-ux/wireframes/mockup-001.svg", "alt": "UI flow board", "size": "large"},
+        {"type": "accent", "color": "#FF6B35", "size": "small"},
+        {"file": "images/design/ui-ux/wireframes/mockup-002.svg", "alt": "Prototype notes", "size": "medium"}
+      ]
+    },
+    {
+      "folder": "images/design/ui-ux/interaction-demos",
+      "items": [
+        {"type": "video", "file": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4", "poster": "images/design/ui-ux/interaction-demos/poster.svg", "size": "wide"},
+        {"type": "youtube", "videoId": "ysz5S6PUM-U", "thumbnail": "auto", "size": "large"}
+      ]
+    },
+    {"spacer": 60},
+    {
+      "folder": "images/design/ui-ux/sound-branding",
+      "items": [
+        {"type": "spotify", "url": "https://open.spotify.com/playlist/37i9dQZF1DX8ymr6UES7vc", "size": "wide"},
+        {"file": "images/design/ui-ux/sound-branding/mood-001.svg", "alt": "Brand mood reference", "size": "medium"}
+      ]
+    }
+  ]
+}
