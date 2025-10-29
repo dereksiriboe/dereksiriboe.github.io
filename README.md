@@ -113,6 +113,16 @@ Use the `size` property to fine tune the grid rhythm:
 
 On smaller breakpoints each dimension scales proportionally to maintain the mosaic.
 
+## 🎛️ Content Builder (drag-and-drop)
+Need a visual way to curate the grids? Open [`admin.html`](./admin.html) in your browser (or serve the repo locally with `python -m http.server`) and use the built-in builder:
+
+1. **Load existing content** — The tool automatically fetches every JSON file inside `data/` and reconstructs its rows as draggable cards.
+2. **Create new blocks** — Use the form on the left to add image, video, audio, YouTube, Spotify, or accent tiles. Drop files directly into the tray to auto-populate filenames and previews.
+3. **Arrange with drag-and-drop** — Move cards between subsection rows or keep them in the “Unassigned” tray for later.
+4. **Export updated JSON** — Export individual subsections or download all JSON payloads at once. Drop the exported file(s) back into `data/` to publish.
+
+> ⚠️ The builder does not upload media files. Make sure any referenced assets exist under `images/` (or an accessible URL) before exporting.
+
 ## 🤖 Automating with n8n
 Because every section is JSON-driven, an n8n workflow can update the site by editing a single file.
 

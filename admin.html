@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content Builder · Derek Siriboe</title>
+  <style>
+    :root {
+      --bg: #f6f6f6;
+      --panel: #ffffff;
+      --border: #d7d7d7;
+      --text: #1f1f1f;
+      --muted: #5a5a5a;
+      --accent: #FF6B35;
+      --accent-dark: #d8562c;
+      --radius: 10px;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 24px 32px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 600px;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      padding: 24px 32px 48px;
+      align-items: flex-start;
+    }
+
+    aside, section.workspace {
+      background: var(--panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        order: -1;
+      }
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+    }
+
+    h3 {
+      margin: 24px 0 12px;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    form#create-item-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      background: #fff;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 40px;
+      padding: 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.15);
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover {
+      background: #f1f1f1;
+    }
+
+    button.destructive {
+      background: #c0392b;
+    }
+
+    button.destructive:hover {
+      background: #992d22;
+    }
+
+    .drop-input {
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.8);
+      transition: border 0.2s ease, background 0.2s ease;
+    }
+
+    .drop-input.is-active {
+      border-color: var(--accent);
+      background: rgba(255, 107, 53, 0.1);
+    }
+
+    .drop-input input[type="file"] {
+      display: none;
+    }
+
+    .library-list,
+    .row-dropzone,
+    .unassigned-dropzone {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 80px;
+    }
+
+    .row-dropzone,
+    .unassigned-dropzone {
+      border: 1px dashed transparent;
+      border-radius: 12px;
+      padding: 12px;
+      transition: border 0.2s ease, background 0.2s ease;
+    }
+
+    .row-dropzone.is-active,
+    .unassigned-dropzone.is-active {
+      border-color: var(--accent);
+      background: rgba(255, 107, 53, 0.08);
+    }
+
+    .media-card {
+      width: 160px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: grab;
+    }
+
+    .media-card:active {
+      cursor: grabbing;
+    }
+
+    .media-card.dragging {
+      opacity: 0.5;
+    }
+
+    .media-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: none;
+      border: none;
+      padding: 0;
+      position: static;
+      box-shadow: none;
+    }
+
+    .media-card .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 107, 53, 0.1);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .media-card .preview {
+      width: 100%;
+      height: 90px;
+      border-radius: 8px;
+      background: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px;
+    }
+
+    .media-card .preview img,
+    .media-card .preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-card .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .media-card .fields label {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .media-card .fields input,
+    .media-card .fields select {
+      font-size: 13px;
+      padding: 8px 10px;
+    }
+
+    .media-card .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .media-card .actions button {
+      flex: 1;
+      font-size: 12px;
+      padding: 6px 8px;
+    }
+
+    .media-card .actions button.secondary {
+      padding: 6px 8px;
+    }
+
+    .subsection-block {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .subsection-block header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .subsection-block header h4 {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .subsection-block header .actions {
+      gap: 6px;
+    }
+
+    .row-block {
+      margin-top: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .row-block .row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .row-block .row-header span {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .row-block .row-header button {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .status-log {
+      margin-top: 24px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.04);
+      font-size: 13px;
+      color: var(--muted);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .status-log strong {
+      color: var(--text);
+    }
+
+    .empty-hint {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px dashed rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .notice {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
+    .notice code {
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Content Builder</h1>
+      <p>Drag assets into subsection rows, edit their metadata, and export JSON files that plug directly into the live site. Upload media files separately via your preferred workflow.</p>
+    </div>
+    <button id="download-everything" type="button">Download all JSON</button>
+  </header>
+  <main>
+    <aside>
+      <h2>Create a media block</h2>
+      <form id="create-item-form">
+        <div class="form-row">
+          <label for="item-kind">Block type</label>
+          <select id="item-kind" required>
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+            <option value="youtube">YouTube</option>
+            <option value="spotify">Spotify</option>
+            <option value="accent">Accent</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="item-title">Title or alt text</label>
+          <input id="item-title" type="text" placeholder="Alt text or internal note">
+        </div>
+        <div class="form-row">
+          <label for="item-source">File path / URL / ID</label>
+          <input id="item-source" type="text" placeholder="e.g. images/photo/new-shot.jpg" required>
+        </div>
+        <div class="form-row">
+          <label for="item-size">Grid size</label>
+          <select id="item-size" required>
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+            <option value="tall">Tall</option>
+            <option value="wide">Wide</option>
+          </select>
+        </div>
+        <button type="submit">Add to unassigned</button>
+      </form>
+
+      <h3>Drop media files</h3>
+      <div class="drop-input" id="file-drop" role="button" tabindex="0">
+        <p>Drop image/video/audio files here or click to browse. The files will be added to the unassigned tray using their filenames—remember to upload the physical files to <code>images/</code> or <code>media/</code> separately.</p>
+        <input id="file-input" type="file" multiple>
+      </div>
+
+      <h3>Unassigned tray</h3>
+      <div class="unassigned-dropzone" id="unassigned-zone" aria-label="Unassigned media blocks"></div>
+      <p class="notice">Drag cards into subsection rows to include them on the site. Cards left here won&apos;t appear anywhere but are saved in the export if you move them later.</p>
+    </aside>
+
+    <section class="workspace" id="workspace">
+      <h2>Sections</h2>
+      <div id="subsection-container"></div>
+      <div class="status-log" id="status-log" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    const sectionConfig = [
+      {
+        id: 'style',
+        label: 'Style',
+        defaultSubsection: 'style-private-client',
+        subsections: [
+          { id: 'style-private-client', label: 'Private Client', data: 'data/style-private-client.json' },
+          { id: 'style-project', label: 'Project', data: 'data/style-project.json' }
+        ]
+      },
+      {
+        id: 'photo',
+        label: 'Photo',
+        defaultSubsection: 'photo-fun',
+        subsections: [
+          { id: 'photo-fun', label: 'Fun', data: 'data/photo-fun.json' },
+          { id: 'photo-project', label: 'Project', data: 'data/photo-project.json' }
+        ]
+      },
+      {
+        id: 'audio-visual',
+        label: 'Audio-Visual',
+        defaultSubsection: 'audio-visual-sound',
+        subsections: [
+          { id: 'audio-visual-sound', label: 'Sound', data: 'data/audio-visual-sound.json' },
+          { id: 'audio-visual-video', label: 'Video', data: 'data/audio-visual-video.json' }
+        ]
+      }
+    ];
+
+    const state = {
+      items: new Map(),
+      subsections: new Map(),
+      unassigned: []
+    };
+
+    const dom = {
+      unassigned: document.getElementById('unassigned-zone'),
+      subsectionContainer: document.getElementById('subsection-container'),
+      statusLog: document.getElementById('status-log'),
+      cards: new Map()
+    };
+
+    const randomId = (prefix) => {
+      if (window.crypto && window.crypto.randomUUID) {
+        return `${prefix}-${crypto.randomUUID()}`;
+      }
+      return `${prefix}-${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
+    };
+
+    const logStatus = (message) => {
+      const entry = document.createElement('div');
+      entry.innerHTML = message;
+      dom.statusLog.prepend(entry);
+    };
+
+    const ensureSubsectionState = (subsectionId) => {
+      if (!state.subsections.has(subsectionId)) {
+        state.subsections.set(subsectionId, { rows: [] });
+      }
+      return state.subsections.get(subsectionId);
+    };
+
+    const inferKind = (data) => {
+      switch (data.type) {
+        case 'video': return 'video';
+        case 'audio': return 'audio';
+        case 'youtube': return 'youtube';
+        case 'spotify': return 'spotify';
+        case 'accent': return 'accent';
+        default:
+          if (data.iframe) return 'iframe';
+          return 'image';
+      }
+    };
+
+    const createItem = (data, meta = {}) => {
+      const id = randomId('item');
+      const kind = meta.kind || inferKind(data);
+      const cleanData = { ...data };
+      if (!cleanData.size) {
+        cleanData.size = 'medium';
+      }
+      const item = {
+        id,
+        data: cleanData,
+        meta: { ...meta, kind },
+        location: { type: 'unassigned' }
+      };
+      state.items.set(id, item);
+      state.unassigned.push(id);
+      ensureCard(item);
+      renderUnassigned();
+      return item;
+    };
+
+    const ensureCard = (item) => {
+      if (dom.cards.has(item.id)) {
+        refreshCard(item.id);
+        return dom.cards.get(item.id).element;
+      }
+      const card = document.createElement('article');
+      card.className = 'media-card';
+      card.draggable = true;
+      card.dataset.itemId = item.id;
+
+      const header = document.createElement('header');
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      header.appendChild(badge);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.textContent = 'Remove';
+      deleteButton.className = 'secondary destructive';
+      deleteButton.addEventListener('click', () => {
+        if (confirm('Remove this block? It will disappear from all rows.')) {
+          removeItem(item.id);
+        }
+      });
+      header.appendChild(deleteButton);
+
+      const preview = document.createElement('div');
+      preview.className = 'preview';
+
+      const typeSelectRow = document.createElement('div');
+      typeSelectRow.className = 'form-row';
+      const typeLabel = document.createElement('label');
+      typeLabel.textContent = 'Block type';
+      const typeSelect = document.createElement('select');
+      ['image','video','audio','youtube','spotify','accent'].forEach(kind => {
+        const option = document.createElement('option');
+        option.value = kind;
+        option.textContent = kind.charAt(0).toUpperCase() + kind.slice(1);
+        typeSelect.appendChild(option);
+      });
+      typeSelect.addEventListener('change', (event) => {
+        setItemKind(item.id, event.target.value);
+        refreshCard(item.id);
+      });
+      typeSelectRow.appendChild(typeLabel);
+      typeSelectRow.appendChild(typeSelect);
+
+      const fields = document.createElement('div');
+      fields.className = 'fields';
+
+      const sizeRow = document.createElement('div');
+      sizeRow.className = 'form-row';
+      const sizeLabel = document.createElement('label');
+      sizeLabel.textContent = 'Grid size';
+      const sizeSelect = document.createElement('select');
+      ['small','medium','large','tall','wide'].forEach(size => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = size.charAt(0).toUpperCase() + size.slice(1);
+        sizeSelect.appendChild(option);
+      });
+      sizeSelect.addEventListener('change', (event) => {
+        const current = state.items.get(item.id);
+        current.data.size = event.target.value;
+      });
+      sizeRow.appendChild(sizeLabel);
+      sizeRow.appendChild(sizeSelect);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const duplicate = document.createElement('button');
+      duplicate.type = 'button';
+      duplicate.textContent = 'Duplicate';
+      duplicate.className = 'secondary';
+      duplicate.addEventListener('click', () => {
+        const cloned = JSON.parse(JSON.stringify(state.items.get(item.id).data));
+        createItem(cloned, { kind: state.items.get(item.id).meta.kind });
+      });
+      actions.appendChild(duplicate);
+
+      card.appendChild(header);
+      card.appendChild(preview);
+      card.appendChild(typeSelectRow);
+      card.appendChild(sizeRow);
+      card.appendChild(fields);
+      card.appendChild(actions);
+
+      card.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', item.id);
+        event.dataTransfer.effectAllowed = 'move';
+        card.classList.add('dragging');
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+      });
+
+      dom.cards.set(item.id, {
+        element: card,
+        refs: {
+          badge,
+          preview,
+          typeSelect,
+          fields,
+          sizeSelect
+        }
+      });
+
+      refreshCard(item.id);
+      return card;
+    };
+
+    const refreshCard = (itemId) => {
+      const item = state.items.get(itemId);
+      if (!item) return;
+      const cardRecord = dom.cards.get(itemId);
+      if (!cardRecord) return;
+      const { badge, preview, typeSelect, fields, sizeSelect } = cardRecord.refs;
+
+      const kind = item.meta.kind;
+      badge.textContent = kind.toUpperCase();
+      typeSelect.value = kind;
+      sizeSelect.value = item.data.size || 'medium';
+
+      updatePreview(preview, item);
+      renderFields(fields, item);
+    };
+
+    const updatePreview = (previewEl, item) => {
+      previewEl.innerHTML = '';
+      const { data, meta } = item;
+      const kind = meta.kind;
+
+      if (kind === 'image' && data.file) {
+        const img = document.createElement('img');
+        img.src = meta.previewUrl || data.file;
+        img.alt = data.alt || 'Preview';
+        previewEl.appendChild(img);
+        return;
+      }
+
+      if (kind === 'video' && data.file) {
+        const video = document.createElement('video');
+        video.src = data.file;
+        video.muted = true;
+        video.loop = true;
+        previewEl.appendChild(video);
+        return;
+      }
+
+      if (kind === 'audio') {
+        previewEl.textContent = data.file ? 'Audio: ' + data.file : 'Audio block';
+        return;
+      }
+
+      if (kind === 'youtube') {
+        previewEl.textContent = data.videoId ? `YouTube · ${data.videoId}` : 'YouTube block';
+        return;
+      }
+
+      if (kind === 'spotify') {
+        previewEl.textContent = data.url ? 'Spotify embed' : 'Spotify block';
+        return;
+      }
+
+      if (kind === 'accent') {
+        const swatch = document.createElement('div');
+        swatch.style.width = '100%';
+        swatch.style.height = '100%';
+        swatch.style.borderRadius = '8px';
+        swatch.style.background = data.color || meta.color || '#FF6B35';
+        previewEl.appendChild(swatch);
+        return;
+      }
+
+      previewEl.textContent = 'Add details to preview';
+    };
+
+    const renderFields = (container, item) => {
+      container.innerHTML = '';
+      const { data, meta } = item;
+      const kind = meta.kind;
+
+      const appendField = (labelText, element) => {
+        const row = document.createElement('div');
+        row.className = 'form-row';
+        const label = document.createElement('label');
+        label.textContent = labelText;
+        row.appendChild(label);
+        row.appendChild(element);
+        container.appendChild(row);
+      };
+
+      if (kind === 'image') {
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.value = data.alt || '';
+        titleInput.placeholder = 'Alt text or short description';
+        titleInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.alt = event.target.value;
+        });
+        appendField('Title / Alt text', titleInput);
+
+        const sourceInput = document.createElement('input');
+        sourceInput.type = 'text';
+        sourceInput.value = data.file || '';
+        sourceInput.placeholder = 'images/...';
+        sourceInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.file = event.target.value;
+          refreshCard(item.id);
+        });
+        appendField('File path or URL', sourceInput);
+      }
+
+      if (kind === 'video' || kind === 'audio') {
+        const sourceInput = document.createElement('input');
+        sourceInput.type = 'text';
+        sourceInput.value = data.file || '';
+        sourceInput.placeholder = 'media/...';
+        sourceInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.file = event.target.value;
+          refreshCard(item.id);
+        });
+        appendField('File path or URL', sourceInput);
+      }
+
+      if (kind === 'video') {
+        const posterInput = document.createElement('input');
+        posterInput.type = 'text';
+        posterInput.value = data.poster || '';
+        posterInput.placeholder = 'Optional poster image path';
+        posterInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.poster = event.target.value;
+        });
+        appendField('Poster image (optional)', posterInput);
+      }
+
+      if (kind === 'youtube') {
+        const idInput = document.createElement('input');
+        idInput.type = 'text';
+        idInput.value = data.videoId || '';
+        idInput.placeholder = 'e.g. dQw4w9WgXcQ';
+        idInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.videoId = event.target.value.trim();
+          refreshCard(item.id);
+        });
+        appendField('YouTube video ID', idInput);
+
+        const thumbInput = document.createElement('input');
+        thumbInput.type = 'text';
+        thumbInput.value = data.thumbnail || 'auto';
+        thumbInput.placeholder = 'auto or custom URL';
+        thumbInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.thumbnail = event.target.value.trim();
+        });
+        appendField('Thumbnail', thumbInput);
+      }
+
+      if (kind === 'spotify') {
+        const urlInput = document.createElement('input');
+        urlInput.type = 'text';
+        urlInput.value = data.url || '';
+        urlInput.placeholder = 'https://open.spotify.com/...';
+        urlInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.url = event.target.value;
+          refreshCard(item.id);
+        });
+        appendField('Spotify URL', urlInput);
+      }
+
+      if (kind === 'accent') {
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = data.color || '#FF6B35';
+        colorInput.addEventListener('input', (event) => {
+          const current = state.items.get(item.id);
+          current.data.color = event.target.value;
+          refreshCard(item.id);
+        });
+        appendField('Accent color', colorInput);
+      }
+    };
+
+    const setItemKind = (itemId, newKind) => {
+      const item = state.items.get(itemId);
+      if (!item) return;
+      if (item.meta.kind === newKind) return;
+      const existing = { ...item.data };
+      const keepSize = existing.size;
+      item.data = { size: keepSize || 'medium' };
+
+      switch (newKind) {
+        case 'image': {
+          item.data.file = existing.file || '';
+          if (existing.alt) item.data.alt = existing.alt;
+          delete item.data.type;
+          break;
+        }
+        case 'video': {
+          item.data.type = 'video';
+          item.data.file = existing.file || '';
+          if (existing.poster) item.data.poster = existing.poster;
+          break;
+        }
+        case 'audio': {
+          item.data.type = 'audio';
+          item.data.file = existing.file || '';
+          break;
+        }
+        case 'youtube': {
+          item.data.type = 'youtube';
+          item.data.videoId = existing.videoId || '';
+          item.data.thumbnail = existing.thumbnail || 'auto';
+          break;
+        }
+        case 'spotify': {
+          item.data.type = 'spotify';
+          item.data.url = existing.url || '';
+          break;
+        }
+        case 'accent': {
+          item.data.type = 'accent';
+          item.data.color = existing.color || '#FF6B35';
+          break;
+        }
+        default: {
+          item.data = { ...existing, size: keepSize || 'medium' };
+        }
+      }
+
+      item.meta.kind = newKind;
+    };
+
+    const removeItem = (itemId) => {
+      const item = state.items.get(itemId);
+      if (!item) return;
+      const previous = detachItem(itemId);
+      if (item.meta && item.meta.previewUrl && String(item.meta.previewUrl).startsWith('blob:')) {
+        URL.revokeObjectURL(item.meta.previewUrl);
+      }
+      state.items.delete(itemId);
+      if (dom.cards.has(itemId)) {
+        dom.cards.get(itemId).element.remove();
+        dom.cards.delete(itemId);
+      }
+      renderLocation(previous);
+    };
+
+    const detachItem = (itemId) => {
+      const item = state.items.get(itemId);
+      if (!item || !item.location) return null;
+      const previous = item.location;
+      if (previous.type === 'row') {
+        const subsection = state.subsections.get(previous.subsectionId);
+        if (subsection) {
+          const row = subsection.rows.find(r => r.id === previous.rowId);
+          if (row) {
+            row.itemIds = row.itemIds.filter(id => id !== itemId);
+          }
+        }
+      } else if (previous.type === 'unassigned') {
+        state.unassigned = state.unassigned.filter(id => id !== itemId);
+      }
+      item.location = null;
+      return previous;
+    };
+
+    const renderLocation = (location) => {
+      if (!location) return;
+      if (location.type === 'unassigned') {
+        renderUnassigned();
+      }
+      if (location.type === 'row') {
+        renderRow(location.subsectionId, location.rowId);
+      }
+    };
+
+    const moveItemToUnassigned = (itemId, beforeId = null) => {
+      const previous = detachItem(itemId);
+      const item = state.items.get(itemId);
+      if (!item) return;
+      item.location = { type: 'unassigned' };
+      if (beforeId && state.unassigned.includes(beforeId)) {
+        const index = state.unassigned.indexOf(beforeId);
+        state.unassigned.splice(index, 0, itemId);
+      } else {
+        state.unassigned.push(itemId);
+      }
+      renderLocation(previous);
+      renderUnassigned();
+    };
+
+    const moveItemToRow = (itemId, subsectionId, rowId, beforeId = null) => {
+      const previous = detachItem(itemId);
+      const item = state.items.get(itemId);
+      if (!item) return;
+      ensureSubsectionState(subsectionId);
+      const subsection = state.subsections.get(subsectionId);
+      const row = subsection.rows.find(r => r.id === rowId);
+      if (!row) return;
+      item.location = { type: 'row', subsectionId, rowId };
+      if (beforeId && row.itemIds.includes(beforeId)) {
+        const index = row.itemIds.indexOf(beforeId);
+        row.itemIds.splice(index, 0, itemId);
+      } else {
+        row.itemIds.push(itemId);
+      }
+      renderLocation(previous);
+      renderRow(subsectionId, rowId);
+    };
+
+    const renderUnassigned = () => {
+      dom.unassigned.innerHTML = '';
+      if (!state.unassigned.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-hint';
+        empty.textContent = 'No unassigned blocks. Use the form above to create new content.';
+        dom.unassigned.appendChild(empty);
+        return;
+      }
+      state.unassigned.forEach(itemId => {
+        const item = state.items.get(itemId);
+        if (!item) return;
+        const card = ensureCard(item);
+        dom.unassigned.appendChild(card);
+      });
+    };
+
+    const renderRow = (subsectionId, rowId) => {
+      const subsectionDom = dom.subsections.get(subsectionId);
+      if (!subsectionDom) return;
+      const rowRecord = subsectionDom.rows.get(rowId);
+      if (!rowRecord) return;
+      const subsection = state.subsections.get(subsectionId);
+      if (!subsection) return;
+      const row = subsection.rows.find(r => r.id === rowId);
+      if (!row) return;
+
+      const list = rowRecord.list;
+      list.innerHTML = '';
+      if (!row.itemIds.length) {
+        const hint = document.createElement('div');
+        hint.className = 'empty-hint';
+        hint.textContent = 'Drop cards here to add them to this row.';
+        list.appendChild(hint);
+        return;
+      }
+      row.itemIds.forEach(itemId => {
+        const item = state.items.get(itemId);
+        if (!item) return;
+        const card = ensureCard(item);
+        list.appendChild(card);
+      });
+    };
+
+    const buildRowElement = (subsectionId, rowState) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'row-block';
+      rowEl.dataset.rowId = rowState.id;
+
+      const header = document.createElement('div');
+      header.className = 'row-header';
+      const label = document.createElement('span');
+      label.textContent = 'Row';
+      header.appendChild(label);
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.className = 'secondary';
+      removeButton.textContent = 'Delete row';
+      removeButton.addEventListener('click', () => {
+        if (confirm('Delete this row? Any cards inside will return to the unassigned tray.')) {
+          removeRow(subsectionId, rowState.id);
+        }
+      });
+      header.appendChild(removeButton);
+
+      const list = document.createElement('div');
+      list.className = 'row-dropzone';
+
+      registerDropZone(list, { type: 'row', subsectionId, rowId: rowState.id });
+
+      rowEl.appendChild(header);
+      rowEl.appendChild(list);
+
+      return { element: rowEl, header, label, list };
+    };
+
+    const updateRowLabels = (subsectionId) => {
+      const subsectionDom = dom.subsections.get(subsectionId);
+      const subsection = state.subsections.get(subsectionId);
+      if (!subsectionDom || !subsection) return;
+      subsection.rows.forEach((row, index) => {
+        const rowDom = subsectionDom.rows.get(row.id);
+        if (rowDom) {
+          rowDom.label.textContent = `Row ${index + 1}`;
+        }
+      });
+    };
+
+    const addRowToSubsection = (subsectionId, rowState = null) => {
+      ensureSubsectionState(subsectionId);
+      const subsection = state.subsections.get(subsectionId);
+      const row = rowState || { id: randomId('row'), itemIds: [] };
+      subsection.rows.push(row);
+      const subsectionDom = dom.subsections.get(subsectionId);
+      const rowDom = buildRowElement(subsectionId, row);
+      subsectionDom.rows.set(row.id, rowDom);
+      subsectionDom.container.appendChild(rowDom.element);
+      renderRow(subsectionId, row.id);
+      updateRowLabels(subsectionId);
+    };
+
+    const removeRow = (subsectionId, rowId) => {
+      const subsection = state.subsections.get(subsectionId);
+      if (!subsection) return;
+      const index = subsection.rows.findIndex(r => r.id === rowId);
+      if (index === -1) return;
+      const [row] = subsection.rows.splice(index, 1);
+      if (row && row.itemIds) {
+        row.itemIds.slice().forEach(itemId => {
+          moveItemToUnassigned(itemId);
+        });
+      }
+      const subsectionDom = dom.subsections.get(subsectionId);
+      const rowDom = subsectionDom.rows.get(rowId);
+      if (rowDom) {
+        rowDom.element.remove();
+        subsectionDom.rows.delete(rowId);
+      }
+      updateRowLabels(subsectionId);
+    };
+
+    const buildSubsectionBlock = (subsection) => {
+      const block = document.createElement('div');
+      block.className = 'subsection-block';
+      block.dataset.subsectionId = subsection.id;
+
+      const header = document.createElement('header');
+      const title = document.createElement('h4');
+      title.textContent = `${subsection.label}`;
+      header.appendChild(title);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const addRowButton = document.createElement('button');
+      addRowButton.type = 'button';
+      addRowButton.className = 'secondary';
+      addRowButton.textContent = 'Add row';
+      addRowButton.addEventListener('click', () => addRowToSubsection(subsection.id));
+      actions.appendChild(addRowButton);
+
+      const exportButton = document.createElement('button');
+      exportButton.type = 'button';
+      exportButton.textContent = 'Export JSON';
+      exportButton.addEventListener('click', () => exportSubsection(subsection.id));
+      actions.appendChild(exportButton);
+
+      header.appendChild(actions);
+      block.appendChild(header);
+
+      const rowsContainer = document.createElement('div');
+      block.appendChild(rowsContainer);
+
+      dom.subsections.set(subsection.id, {
+        element: block,
+        rows: new Map(),
+        container: rowsContainer
+      });
+
+      return block;
+    };
+
+    const registerDropZone = (element, target) => {
+      element.addEventListener('dragover', (event) => {
+        if (!event.dataTransfer.types.includes('text/plain')) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        element.classList.add('is-active');
+      });
+      element.addEventListener('dragleave', (event) => {
+        if (event.currentTarget === element) {
+          element.classList.remove('is-active');
+        }
+      });
+      element.addEventListener('drop', (event) => {
+        event.preventDefault();
+        element.classList.remove('is-active');
+        const itemId = event.dataTransfer.getData('text/plain');
+        if (!itemId) return;
+        const beforeCard = event.target.closest('.media-card');
+        const beforeId = beforeCard && beforeCard.dataset.itemId !== itemId
+          ? beforeCard.dataset.itemId
+          : null;
+
+        if (target.type === 'row') {
+          moveItemToRow(itemId, target.subsectionId, target.rowId, beforeId);
+        } else if (target.type === 'unassigned') {
+          moveItemToUnassigned(itemId, beforeId);
+        }
+      });
+    };
+
+    const exportSubsection = (subsectionId) => {
+      const subsection = state.subsections.get(subsectionId);
+      if (!subsection) {
+        alert('Nothing to export yet!');
+        return;
+      }
+      const payload = {
+        rows: subsection.rows.map(row => row.itemIds.map(itemId => state.items.get(itemId)?.data || {}))
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${subsectionId}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      logStatus(`<strong>${subsectionId}</strong> exported at ${new Date().toLocaleTimeString()}`);
+    };
+
+    const exportAll = () => {
+      const zipParts = [];
+      sectionConfig.forEach(section => {
+        section.subsections.forEach(subsection => {
+          const stateSub = state.subsections.get(subsection.id);
+          if (!stateSub) return;
+          const payload = {
+            rows: stateSub.rows.map(row => row.itemIds.map(itemId => state.items.get(itemId)?.data || {}))
+          };
+          zipParts.push({ name: `${subsection.id}.json`, content: JSON.stringify(payload, null, 2) });
+        });
+      });
+
+      if (!zipParts.length) {
+        alert('No subsection data to download yet. Try loading data or creating blocks first.');
+        return;
+      }
+
+      if (zipParts.length === 1) {
+        const file = zipParts[0];
+        const blob = new Blob([file.content], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = file.name;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      } else {
+        const boundary = '\n\n';
+        let bundle = '';
+        zipParts.forEach(file => {
+          bundle += `// ${file.name}${boundary}${file.content}${boundary}`;
+        });
+        const blob = new Blob([bundle], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'content-bundle.txt';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
+      logStatus(`Downloaded ${zipParts.length} file(s) at ${new Date().toLocaleTimeString()}`);
+    };
+
+    const buildWorkspace = () => {
+      sectionConfig.forEach(section => {
+        const sectionTitle = document.createElement('h3');
+        sectionTitle.textContent = section.label;
+        dom.subsectionContainer.appendChild(sectionTitle);
+        section.subsections.forEach(subsection => {
+          const block = buildSubsectionBlock(subsection);
+          dom.subsectionContainer.appendChild(block);
+          ensureSubsectionState(subsection.id);
+        });
+      });
+    };
+
+    const loadSubsectionData = async (subsection) => {
+      ensureSubsectionState(subsection.id);
+      try {
+        const response = await fetch(subsection.data, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const json = await response.json();
+        if (json && Array.isArray(json.rows)) {
+          json.rows.forEach(rowItems => {
+            const rowState = { id: randomId('row'), itemIds: [] };
+            const subsectionState = state.subsections.get(subsection.id);
+            subsectionState.rows.push(rowState);
+            const subsectionDom = dom.subsections.get(subsection.id);
+            const rowDom = buildRowElement(subsection.id, rowState);
+            subsectionDom.rows.set(rowState.id, rowDom);
+            subsectionDom.container.appendChild(rowDom.element);
+
+            rowItems.forEach(itemData => {
+              const cloned = JSON.parse(JSON.stringify(itemData));
+              const kind = inferKind(cloned);
+              const item = createItem(cloned, { kind });
+              moveItemToRow(item.id, subsection.id, rowState.id);
+            });
+          });
+        }
+        if (!state.subsections.get(subsection.id).rows.length) {
+          addRowToSubsection(subsection.id);
+        }
+        updateRowLabels(subsection.id);
+        logStatus(`Loaded <strong>${subsection.label}</strong> data`);
+      } catch (error) {
+        logStatus(`⚠️ Unable to load <strong>${subsection.label}</strong>: ${error.message}`);
+        addRowToSubsection(subsection.id);
+      }
+    };
+
+    const initialize = async () => {
+      buildWorkspace();
+      registerDropZone(dom.unassigned, { type: 'unassigned' });
+      renderUnassigned();
+
+      for (const section of sectionConfig) {
+        for (const subsection of section.subsections) {
+          await loadSubsectionData(subsection);
+        }
+      }
+    };
+
+    const bindForm = () => {
+      const form = document.getElementById('create-item-form');
+      const kindInput = document.getElementById('item-kind');
+      const titleInput = document.getElementById('item-title');
+      const sourceInput = document.getElementById('item-source');
+      const sizeInput = document.getElementById('item-size');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const kind = kindInput.value;
+        const size = sizeInput.value || 'medium';
+        const title = titleInput.value.trim();
+        const source = sourceInput.value.trim();
+        if (!source) {
+          alert('Please provide a path, URL, or ID for this block.');
+          return;
+        }
+        const payload = { size };
+        switch (kind) {
+          case 'image':
+            payload.file = source;
+            if (title) payload.alt = title;
+            break;
+          case 'video':
+            payload.type = 'video';
+            payload.file = source;
+            break;
+          case 'audio':
+            payload.type = 'audio';
+            payload.file = source;
+            break;
+          case 'youtube':
+            payload.type = 'youtube';
+            payload.videoId = source;
+            payload.thumbnail = 'auto';
+            break;
+          case 'spotify':
+            payload.type = 'spotify';
+            payload.url = source;
+            break;
+          case 'accent':
+            payload.type = 'accent';
+            payload.color = source || '#FF6B35';
+            break;
+          default:
+            payload.file = source;
+        }
+        createItem(payload, { kind });
+        form.reset();
+        sizeInput.value = size;
+      });
+    };
+
+    const bindFileDrop = () => {
+      const drop = document.getElementById('file-drop');
+      const input = document.getElementById('file-input');
+
+      const handleFiles = (files) => {
+        Array.from(files).forEach(file => {
+          const payload = {
+            size: 'medium',
+            file: file.name,
+            alt: file.name
+          };
+          const previewUrl = URL.createObjectURL(file);
+          const item = createItem(payload, { kind: file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'image', previewUrl });
+          item.meta.previewUrl = previewUrl;
+          setTimeout(() => {
+            logStatus(`Added <strong>${file.name}</strong> to unassigned tray.`);
+          }, 0);
+        });
+      };
+
+      drop.addEventListener('click', () => {
+        input.click();
+      });
+
+      drop.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        drop.classList.add('is-active');
+      });
+
+      drop.addEventListener('dragleave', () => {
+        drop.classList.remove('is-active');
+      });
+
+      drop.addEventListener('drop', (event) => {
+        event.preventDefault();
+        drop.classList.remove('is-active');
+        if (event.dataTransfer.files && event.dataTransfer.files.length) {
+          handleFiles(event.dataTransfer.files);
+        }
+      });
+
+      input.addEventListener('change', (event) => {
+        if (event.target.files && event.target.files.length) {
+          handleFiles(event.target.files);
+        }
+      });
+    };
+
+    document.getElementById('download-everything').addEventListener('click', exportAll);
+
+    bindForm();
+    bindFileDrop();
+    initialize();
+  </script>
+</body>
+</html>
