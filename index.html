@@ -216,6 +216,10 @@
     .large { width: 160px; height: 80px; }
     .tall { width: 80px; height: 120px; }
     .wide { width: 200px; height: 80px; }
+    .playlist { width: 100%; max-width: 640px; height: 352px; }
+
+    .spotify-embed { background: transparent; }
+    .spotify-embed iframe { border-radius: 12px; }
 
     .hero-grid {
       margin-top: 40px;
@@ -347,6 +351,7 @@
         defaultSubsection: 'audio-visual-sound',
         subsections: [
           { id: 'audio-visual-sound', label: 'sound', data: 'data/audio-visual-sound.json' },
+          { id: 'audio-visual-playlists', label: 'playlists', data: 'data/audio-visual-playlists.json' },
           { id: 'audio-visual-video', label: 'video', data: 'data/audio-visual-video.json' }
         ]
       },
@@ -450,7 +455,7 @@
         }
       }
 
-      const sizeClass = ['small','medium','large','tall','wide'].includes(normalized.size) ? normalized.size : 'medium';
+      const sizeClass = ['small','medium','large','tall','wide','playlist'].includes(normalized.size) ? normalized.size : 'medium';
       const wrapper = document.createElement('div');
       wrapper.className = `grid-item ${sizeClass}`;
 
@@ -487,6 +492,7 @@
           return link;
         }
         case 'spotify': {
+          wrapper.classList.add('spotify-embed');
           const iframe = document.createElement('iframe');
           iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
           iframe.loading = 'lazy';
