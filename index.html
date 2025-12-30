@@ -384,9 +384,9 @@
       {
         id: 'natural',
         label: 'natural',
-        defaultSubsection: 'natural-all',
+        defaultSubsection: 'natural',
         subsections: [
-          { id: 'natural-all', label: 'all', data: 'data/natural.json' }
+          { id: 'natural', label: 'natural', data: 'data/natural.json' }
         ]
       },
       {
@@ -494,6 +494,10 @@
 
     function renderSubNav(section, activeSubId) {
       subNavContainer.innerHTML = '';
+      // Only show sub-navigation if there are multiple subsections
+      if (section.subsections.length <= 1) {
+        return;
+      }
       const nav = document.createElement('nav');
       nav.className = 'sub-nav';
       nav.setAttribute('aria-label', `${section.label} subsections`);

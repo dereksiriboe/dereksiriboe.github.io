@@ -92,10 +92,9 @@ generate_json_with_subfolders() {
     done
 }
 
-# 1. Sync NATURAL photos (all in one folder)
+# 1. Generate NATURAL photos JSON (no sync - add photos directly to images/natural/)
 echo ""
-echo "1. Syncing NATURAL photos..."
-rsync -av --delete "$DESKTOP_DIR/natural/" "$REPO_DIR/images/natural/" --include='*.jpg' --include='*.jpeg' --include='*.png' --include='*.gif' --include='*.webp' --include='*.JPG' --include='*.JPEG' --include='*.PNG' --include='*.GIF' --include='*.WEBP' --exclude='*'
+echo "1. Generating natural.json from images/natural/..."
 generate_json_for_folder "$REPO_DIR/images/natural" "$REPO_DIR/data/natural.json"
 echo "  Created: data/natural.json"
 
