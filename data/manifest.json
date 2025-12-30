@@ -1,6 +1,14 @@
 {
   "project": [
-    "glassblowing"
+    "boston",
+    "chicago",
+    "cincinnati",
+    "columbus",
+    "glassblowing",
+    "granville",
+    "granville2",
+    "hocking hills",
+    "new york"
   ],
   "bonus": [
     "flatlay style"

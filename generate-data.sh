@@ -68,7 +68,12 @@ generate_json_with_subfolders() {
             esac
 
             filename=$(basename "$img")
-            relative_path="images/${section_name}/${subfolder_name}/$filename"
+            # Map section_name: 'project' should look in 'library' folder
+            local image_folder="$section_name"
+            if [ "$section_name" = "project" ]; then
+                image_folder="library"
+            fi
+            relative_path="images/${image_folder}/${subfolder_name}/$filename"
 
             if [ "$first" = true ]; then
                 first=false
@@ -93,10 +98,10 @@ echo "1. Generating natural.json..."
 generate_json_for_folder "$REPO_DIR/images/natural" "$REPO_DIR/data/natural.json" "images/natural"
 echo "  Created: natural.json"
 
-# 2. Generate PROJECT photos JSONs
+# 2. Generate LIBRARY photos JSONs (formerly project)
 echo ""
-echo "2. Generating project data files..."
-generate_json_with_subfolders "$REPO_DIR/images/project" "$REPO_DIR/data" "project"
+echo "2. Generating library data files..."
+generate_json_with_subfolders "$REPO_DIR/images/library" "$REPO_DIR/data" "project"
 
 # 3. Generate BONUS photos JSONs
 echo ""
@@ -110,7 +115,7 @@ echo '{' > "$REPO_DIR/data/manifest.json"
 echo '  "project": [' >> "$REPO_DIR/data/manifest.json"
 
 first=true
-for subfolder in "$REPO_DIR/images/project"/*; do
+for subfolder in "$REPO_DIR/images/library"/*; do
     [ -d "$subfolder" ] || continue
 
     subfolder_name=$(basename "$subfolder")
