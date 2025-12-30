@@ -109,7 +109,17 @@ for subfolder in "$REPO_DIR/images/library"/*; do
 
     subfolder_name=$(basename "$subfolder")
 
-    # Add each image from this folder as a separate row
+    # Start a new row for this folder
+    if [ "$first_folder" = true ]; then
+        first_folder=false
+    else
+        echo ',' >> "$REPO_DIR/data/library.json"
+    fi
+
+    echo -n '    [' >> "$REPO_DIR/data/library.json"
+
+    # Add all images from this folder to the same row
+    first_img=true
     for img in "$subfolder"/*; do
         [ -f "$img" ] || continue
 
@@ -122,14 +132,16 @@ for subfolder in "$REPO_DIR/images/library"/*; do
         filename=$(basename "$img")
         relative_path="images/library/${subfolder_name}/$filename"
 
-        if [ "$first_folder" = true ]; then
-            first_folder=false
+        if [ "$first_img" = true ]; then
+            first_img=false
         else
-            echo ',' >> "$REPO_DIR/data/library.json"
+            echo -n ', ' >> "$REPO_DIR/data/library.json"
         fi
 
-        echo "    [{\"type\": \"image\", \"file\": \"$relative_path\", \"size\": \"medium\"}]" >> "$REPO_DIR/data/library.json"
+        echo -n "{\"type\": \"image\", \"file\": \"$relative_path\", \"size\": \"medium\"}" >> "$REPO_DIR/data/library.json"
     done
+
+    echo ']' >> "$REPO_DIR/data/library.json"
 done
 
 echo '' >> "$REPO_DIR/data/library.json"
