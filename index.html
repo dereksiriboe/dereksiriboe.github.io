@@ -285,6 +285,56 @@
       .wide { width: 140px; height: 60px; }
       .grid-spacer { height: 30px; }
     }
+
+    /* Lightbox styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+
+    .lightbox.is-open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      cursor: zoom-out;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      line-height: 1;
+      font-weight: 300;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      opacity: 1;
+    }
+
+    .grid-item.clickable {
+      cursor: zoom-in;
+    }
   </style>
 </head>
 <body>
@@ -304,6 +354,12 @@
     <div id="sub-nav-container"></div>
 
     <main class="content" id="content" role="main"></main>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <img id="lightbox-img" src="" alt="">
   </div>
 
   <template id="home-template">
@@ -557,6 +613,8 @@
           img.src = normalized.file;
           img.alt = normalized.alt || deriveAlt(normalized.file);
           wrapper.appendChild(img);
+          wrapper.classList.add('clickable');
+          wrapper.addEventListener('click', () => openLightbox(normalized.file, img.alt));
         }
       }
 
@@ -637,6 +695,37 @@
 
     document.getElementById('home-button').addEventListener('click', () => {
       window.location.hash = '';
+    });
+
+    // Lightbox functionality
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    function openLightbox(src, alt) {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || '';
+      lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target === lightboxImg) {
+        closeLightbox();
+      }
+    });
+
+    lightboxClose.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('is-open')) {
+        closeLightbox();
+      }
     });
 
     // Initialize
