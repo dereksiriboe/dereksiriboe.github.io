@@ -12,7 +12,7 @@
       --muted: #666666;
       --accent-orange: #FF6B35;
       --max-width: 1200px;
-      --gutter: 10px;
+      --gutter: 0px;
     }
 
     *, *::before, *::after {
@@ -24,7 +24,7 @@
       padding: 0;
       background: var(--primary-bg);
       color: var(--primary-fg);
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Times New Roman', Times, serif;
       font-size: 16px;
       line-height: 1.6;
     }
@@ -41,7 +41,9 @@
 
     .site-header {
       margin-bottom: 40px;
-      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       transition: box-shadow 0.2s ease;
     }
 
@@ -74,6 +76,17 @@
     }
 
     .site-header .email a:hover {
+      text-decoration: underline;
+    }
+
+    .site-header .about-link {
+      font-size: 16px;
+      color: var(--primary-fg);
+      text-decoration: none;
+      padding-top: 2px;
+    }
+
+    .site-header .about-link:hover {
       text-decoration: underline;
     }
 
@@ -332,6 +345,40 @@
       opacity: 1;
     }
 
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 20px;
+      line-height: 1;
+      font-weight: 300;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      user-select: none;
+    }
+
+    .lightbox-nav:hover {
+      opacity: 1;
+    }
+
+    .lightbox-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .lightbox-prev {
+      left: 20px;
+    }
+
+    .lightbox-next {
+      right: 20px;
+    }
+
     .grid-item.clickable {
       cursor: zoom-in;
     }
@@ -345,6 +392,7 @@
         <span class="location">New York, NY</span>
         <span class="email"><a href="mailto:asap@cocoyams.com">asap@cocoyams.com</a></span>
       </button>
+      <a href="#about" class="about-link">about</a>
     </header>
 
     <nav class="primary-nav" id="primary-nav" aria-label="Primary">
@@ -359,6 +407,8 @@
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous">&lsaquo;</button>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next">&rsaquo;</button>
     <img id="lightbox-img" src="" alt="">
   </div>
 
@@ -382,16 +432,8 @@
     // Initial config - subsections for project and bonus will be loaded dynamically
     let sectionConfig = [
       {
-        id: 'natural',
-        label: 'natural',
-        defaultSubsection: 'natural',
-        subsections: [
-          { id: 'natural', label: 'natural', data: 'data/natural.json' }
-        ]
-      },
-      {
-        id: 'project',
-        label: 'project',
+        id: 'library',
+        label: 'library',
         defaultSubsection: null,
         subsections: []
       },
@@ -399,7 +441,17 @@
         id: 'bonus',
         label: 'bonus',
         defaultSubsection: null,
-        subsections: []
+        subsections: [],
+        hideFromHome: true
+      },
+      {
+        id: 'about',
+        label: 'about',
+        defaultSubsection: 'about',
+        subsections: [
+          { id: 'about', label: 'about', data: null }
+        ],
+        hideFromNav: true
       }
     ];
 
@@ -412,15 +464,15 @@
 
         const manifest = await response.json();
 
-        // Update project subsections
+        // Update library subsections (formerly project)
         if (manifest.project && manifest.project.length > 0) {
-          const projectSection = sectionConfig.find(s => s.id === 'project');
-          projectSection.subsections = manifest.project.map(name => ({
+          const librarySection = sectionConfig.find(s => s.id === 'library');
+          librarySection.subsections = manifest.project.map(name => ({
             id: `project-${name}`,
             label: name,
             data: `data/project-${name}.json`
           }));
-          projectSection.defaultSubsection = projectSection.subsections[0]?.id || null;
+          librarySection.defaultSubsection = librarySection.subsections[0]?.id || null;
         }
 
         // Update bonus subsections
@@ -467,9 +519,15 @@
     const loadingTemplate = document.getElementById('loading-template');
     const errorTemplate = document.getElementById('error-template');
 
-    function buildPrimaryNav() {
+    function buildPrimaryNav(currentSection = null) {
       primaryNav.innerHTML = '';
       sectionConfig.forEach(section => {
+        // Skip sections marked to hide from nav
+        if (section.hideFromNav) return;
+
+        // On home page, only show library (hide bonus)
+        if (!currentSection && section.hideFromHome) return;
+
         const link = document.createElement('a');
         link.href = `#${section.defaultSubsection}`;
         link.textContent = section.label;
@@ -490,6 +548,7 @@
       subNavContainer.innerHTML = '';
       content.innerHTML = '';
       content.appendChild(homeTemplate.content.cloneNode(true));
+      buildPrimaryNav(null); // Rebuild nav for home page (library only)
     }
 
     function renderSubNav(section, activeSubId) {
@@ -668,9 +727,22 @@
     async function renderSubsection(target) {
       document.body.classList.add('is-subpage');
       const { section, subsection } = target;
+
+      // Rebuild nav when on library page to show bonus
+      if (section.id === 'library' || section.id === 'bonus') {
+        buildPrimaryNav(section.id);
+      }
+
       setActivePrimary(section.id);
       renderSubNav(section, subsection.id);
       content.innerHTML = '';
+
+      // Handle about page (no data to load)
+      if (section.id === 'about') {
+        content.innerHTML = '<div style="padding:40px 0; color: var(--muted);">About content goes here.</div>';
+        return;
+      }
+
       content.appendChild(loadingTemplate.content.cloneNode(true));
       try {
         const data = await loadSubsectionData(subsection);
@@ -705,17 +777,59 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+
+    let currentLightboxImages = [];
+    let currentLightboxIndex = -1;
 
     function openLightbox(src, alt) {
+      // Build list of all clickable images on current page
+      currentLightboxImages = Array.from(document.querySelectorAll('.grid-item.clickable img')).map(img => ({
+        src: img.src,
+        alt: img.alt
+      }));
+
+      // Find index of current image
+      currentLightboxIndex = currentLightboxImages.findIndex(img => img.src === src);
+
       lightboxImg.src = src;
       lightboxImg.alt = alt || '';
       lightbox.classList.add('is-open');
       document.body.style.overflow = 'hidden';
+      updateLightboxNav();
     }
 
     function closeLightbox() {
       lightbox.classList.remove('is-open');
       document.body.style.overflow = '';
+      currentLightboxImages = [];
+      currentLightboxIndex = -1;
+    }
+
+    function updateLightboxNav() {
+      lightboxPrev.disabled = currentLightboxIndex <= 0;
+      lightboxNext.disabled = currentLightboxIndex >= currentLightboxImages.length - 1;
+    }
+
+    function showPrevImage() {
+      if (currentLightboxIndex > 0) {
+        currentLightboxIndex--;
+        const img = currentLightboxImages[currentLightboxIndex];
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        updateLightboxNav();
+      }
+    }
+
+    function showNextImage() {
+      if (currentLightboxIndex < currentLightboxImages.length - 1) {
+        currentLightboxIndex++;
+        const img = currentLightboxImages[currentLightboxIndex];
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        updateLightboxNav();
+      }
     }
 
     lightbox.addEventListener('click', (e) => {
@@ -725,10 +839,18 @@
     });
 
     lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxNext.addEventListener('click', showNextImage);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('is-open')) {
-        closeLightbox();
+      if (lightbox.classList.contains('is-open')) {
+        if (e.key === 'Escape') {
+          closeLightbox();
+        } else if (e.key === 'ArrowLeft') {
+          showPrevImage();
+        } else if (e.key === 'ArrowRight') {
+          showNextImage();
+        }
       }
     });
 
