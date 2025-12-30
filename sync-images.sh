@@ -16,8 +16,14 @@ generate_json_for_folder() {
     echo '{"rows": [' > "$output_json"
 
     first=true
-    for img in "$folder_path"/*.{jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP} 2>/dev/null; do
+    for img in "$folder_path"/*; do
         [ -f "$img" ] || continue
+
+        # Check if file has valid image extension
+        case "${img##*.}" in
+            jpg|jpeg|png|gif|webp|JPG|JPEG|PNG|GIF|WEBP) ;;
+            *) continue ;;
+        esac
 
         filename=$(basename "$img")
         relative_path="images/$(basename $(dirname "$output_json"))/$filename"
@@ -57,8 +63,14 @@ generate_json_with_subfolders() {
         echo '{"rows": [' > "$output_json"
 
         first=true
-        for img in "$image_dir/$subfolder_name"/*.{jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP} 2>/dev/null; do
+        for img in "$image_dir/$subfolder_name"/*; do
             [ -f "$img" ] || continue
+
+            # Check if file has valid image extension
+            case "${img##*.}" in
+                jpg|jpeg|png|gif|webp|JPG|JPEG|PNG|GIF|WEBP) ;;
+                *) continue ;;
+            esac
 
             filename=$(basename "$img")
             relative_path="images/$(basename "$base_folder")/$subfolder_name/$filename"
