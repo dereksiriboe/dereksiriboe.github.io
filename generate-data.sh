@@ -98,10 +98,44 @@ echo "1. Generating natural.json..."
 generate_json_for_folder "$REPO_DIR/images/natural" "$REPO_DIR/data/natural.json" "images/natural"
 echo "  Created: natural.json"
 
-# 2. Generate LIBRARY photos JSONs (formerly project)
+# 2. Generate combined LIBRARY JSON (all folders as rows)
 echo ""
-echo "2. Generating library data files..."
-generate_json_with_subfolders "$REPO_DIR/images/library" "$REPO_DIR/data" "project"
+echo "2. Generating combined library.json..."
+echo '{"rows": [' > "$REPO_DIR/data/library.json"
+
+first_folder=true
+for subfolder in "$REPO_DIR/images/library"/*; do
+    [ -d "$subfolder" ] || continue
+
+    subfolder_name=$(basename "$subfolder")
+
+    # Add each image from this folder as a separate row
+    for img in "$subfolder"/*; do
+        [ -f "$img" ] || continue
+
+        # Check if file has valid image extension
+        case "${img##*.}" in
+            jpg|jpeg|png|gif|webp|JPG|JPEG|PNG|GIF|WEBP) ;;
+            *) continue ;;
+        esac
+
+        filename=$(basename "$img")
+        relative_path="images/library/${subfolder_name}/$filename"
+
+        if [ "$first_folder" = true ]; then
+            first_folder=false
+        else
+            echo ',' >> "$REPO_DIR/data/library.json"
+        fi
+
+        echo "    [{\"type\": \"image\", \"file\": \"$relative_path\", \"size\": \"medium\"}]" >> "$REPO_DIR/data/library.json"
+    done
+done
+
+echo '' >> "$REPO_DIR/data/library.json"
+echo '  ]' >> "$REPO_DIR/data/library.json"
+echo '}' >> "$REPO_DIR/data/library.json"
+echo "  Created: library.json"
 
 # 3. Generate BONUS photos JSONs
 echo ""
@@ -113,23 +147,7 @@ echo ""
 echo "4. Generating manifest.json..."
 echo '{' > "$REPO_DIR/data/manifest.json"
 echo '  "project": [' >> "$REPO_DIR/data/manifest.json"
-
-first=true
-for subfolder in "$REPO_DIR/images/library"/*; do
-    [ -d "$subfolder" ] || continue
-
-    subfolder_name=$(basename "$subfolder")
-
-    if [ "$first" = true ]; then
-        first=false
-    else
-        echo ',' >> "$REPO_DIR/data/manifest.json"
-    fi
-
-    echo -n "    \"$subfolder_name\"" >> "$REPO_DIR/data/manifest.json"
-done
-
-echo '' >> "$REPO_DIR/data/manifest.json"
+echo '    "library"' >> "$REPO_DIR/data/manifest.json"
 echo '  ],' >> "$REPO_DIR/data/manifest.json"
 echo '  "bonus": [' >> "$REPO_DIR/data/manifest.json"
 

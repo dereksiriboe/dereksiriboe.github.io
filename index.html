@@ -469,9 +469,9 @@
         if (manifest.project && manifest.project.length > 0) {
           const librarySection = sectionConfig.find(s => s.id === 'library');
           librarySection.subsections = manifest.project.map(name => ({
-            id: `project-${name}`,
+            id: name,
             label: name,
-            data: `data/project-${name}.json`
+            data: `data/${name}.json`
           }));
           librarySection.defaultSubsection = librarySection.subsections[0]?.id || null;
         }
