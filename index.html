@@ -232,6 +232,18 @@
       font-size: 16px;
     }
 
+    .hero-image {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     @media (max-width: 900px) {
       .site-wrapper {
         padding: 32px 24px;
@@ -296,23 +308,8 @@
 
   <template id="home-template">
     <section class="home-view" aria-label="Featured work">
-      <p class="home-description">
-        Minimal commissions and ongoing experiments across style, photo, and audio-visual practice.
-      </p>
-      <div class="grid hero-grid">
-        <div class="grid-item wide"><img src="images/style/project/project-001.jpg" alt="Editorial lookbook pose" loading="lazy"></div>
-        <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item tall"><img src="images/style/private-client/client-001.jpg" alt="Private client portrait" loading="lazy"></div>
-        <div class="grid-item medium"><img src="images/photo/fun/fun-001.jpg" alt="Road trip snapshot" loading="lazy"></div>
-        <div class="grid-item large"><img src="images/photo/project/photo-proj-001.jpg" alt="Brand shoot portrait" loading="lazy"></div>
-        <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item large"><img src="images/style/project/project-003.jpg" alt="Studio lighting experiment" loading="lazy"></div>
-        <div class="grid-item wide"><img src="images/photo/fun/fun-002.jpg" alt="Sunset over water" loading="lazy"></div>
-        <div class="grid-item tall"><img src="images/photo/project/photo-proj-002.jpg" alt="Product detail" loading="lazy"></div>
-        <div class="grid-item medium"><img src="images/style/private-client/client-002.jpg" alt="Client posing in studio" loading="lazy"></div>
-        <div class="grid-item small accent-block" aria-hidden="true"></div>
-        <div class="grid-item large"><img src="images/style/private-client/client-003.jpg" alt="Editorial-style portrait" loading="lazy"></div>
-        <div class="grid-item medium"><img src="images/photo/fun/fun-003.jpg" alt="Candid street scene" loading="lazy"></div>
+      <div class="hero-image">
+        <img src="images/hero/hero.jpg" alt="Derek Siriboe" loading="eager">
       </div>
     </section>
   </template>
@@ -326,45 +323,77 @@
   </template>
 
   <script>
-    const sectionConfig = [
+    // Initial config - subsections for project and bonus will be loaded dynamically
+    let sectionConfig = [
       {
-        id: 'style',
-        label: 'style',
-        defaultSubsection: 'style-private-client',
+        id: 'natural',
+        label: 'natural',
+        defaultSubsection: 'natural-all',
         subsections: [
-          { id: 'style-private-client', label: 'private-client', data: 'data/style-private-client.json' },
-          { id: 'style-project', label: 'project', data: 'data/style-project.json' }
+          { id: 'natural-all', label: 'all', data: 'data/natural.json' }
         ]
       },
       {
-        id: 'photo',
-        label: 'photo',
-        defaultSubsection: 'photo-fun',
-        subsections: [
-          { id: 'photo-fun', label: 'fun', data: 'data/photo-fun.json' },
-          { id: 'photo-project', label: 'project', data: 'data/photo-project.json' }
-        ]
+        id: 'project',
+        label: 'project',
+        defaultSubsection: null,
+        subsections: []
       },
       {
-        id: 'audio-visual',
-        label: 'audio-visual',
-        defaultSubsection: 'audio-visual-sound',
-        subsections: [
-          { id: 'audio-visual-sound', label: 'sound', data: 'data/audio-visual-sound.json' },
-          { id: 'audio-visual-playlists', label: 'playlists', data: 'data/audio-visual-playlists.json' },
-          { id: 'audio-visual-video', label: 'video', data: 'data/audio-visual-video.json' }
-        ]
-      },
-      {
-        id: 'design',
-        label: 'design',
-        defaultSubsection: 'design-garment',
-        subsections: [
-          { id: 'design-garment', label: 'garment', data: 'data/design-garment.json' },
-          { id: 'design-ui-ux', label: 'ui-ux', data: 'data/design-ui-ux.json' }
-        ]
+        id: 'bonus',
+        label: 'bonus',
+        defaultSubsection: null,
+        subsections: []
       }
     ];
+
+    // Function to load dynamic subsections from data folder
+    async function loadDynamicSubsections() {
+      try {
+        // Fetch list of data files
+        const response = await fetch('data/manifest.json', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const manifest = await response.json();
+
+        // Update project subsections
+        if (manifest.project && manifest.project.length > 0) {
+          const projectSection = sectionConfig.find(s => s.id === 'project');
+          projectSection.subsections = manifest.project.map(name => ({
+            id: `project-${name}`,
+            label: name,
+            data: `data/project-${name}.json`
+          }));
+          projectSection.defaultSubsection = projectSection.subsections[0]?.id || null;
+        }
+
+        // Update bonus subsections
+        if (manifest.bonus && manifest.bonus.length > 0) {
+          const bonusSection = sectionConfig.find(s => s.id === 'bonus');
+          bonusSection.subsections = manifest.bonus.map(name => ({
+            id: `bonus-${name}`,
+            label: name,
+            data: `data/bonus-${name}.json`
+          }));
+          bonusSection.defaultSubsection = bonusSection.subsections[0]?.id || null;
+        }
+
+        // Rebuild subsection lookup
+        rebuildSubsectionLookup();
+        buildPrimaryNav();
+      } catch (error) {
+        console.warn('Could not load dynamic subsections:', error);
+      }
+    }
+
+    function rebuildSubsectionLookup() {
+      subsectionLookup.clear();
+      sectionConfig.forEach(section => {
+        section.subsections.forEach(sub => {
+          subsectionLookup.set(sub.id, { section, subsection: sub });
+        });
+      });
+    }
 
     const subsectionLookup = new Map();
     sectionConfig.forEach(section => {
@@ -610,9 +639,15 @@
       window.location.hash = '';
     });
 
-    buildPrimaryNav();
-    window.addEventListener('hashchange', handleRoute);
-    handleRoute();
+    // Initialize
+    async function init() {
+      await loadDynamicSubsections();
+      buildPrimaryNav();
+      window.addEventListener('hashchange', handleRoute);
+      handleRoute();
+    }
+
+    init();
   </script>
 </body>
 </html>
