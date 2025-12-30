@@ -158,13 +158,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      height: auto;
     }
 
     .grid-item img,
     .grid-item video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: 150px;
+      width: auto;
+      object-fit: contain;
       display: block;
     }
 
@@ -225,11 +226,6 @@
       height: 60px;
     }
 
-    .small { width: 80px; height: 80px; }
-    .medium { width: 120px; height: 80px; }
-    .large { width: 160px; height: 80px; }
-    .tall { width: 80px; height: 120px; }
-    .wide { width: 200px; height: 80px; }
     .playlist { width: 100%; max-width: 640px; height: 352px; }
 
     .spotify-embed { background: transparent; }
@@ -275,11 +271,11 @@
         margin-bottom: 24px;
       }
 
-      .small { width: 70px; height: 70px; }
-      .medium { width: 100px; height: 70px; }
-      .large { width: 140px; height: 70px; }
-      .tall { width: 70px; height: 100px; }
-      .wide { width: 160px; height: 70px; }
+      .grid-item img,
+      .grid-item video {
+        height: 120px;
+      }
+
       .grid-spacer { height: 40px; }
     }
 
@@ -292,11 +288,11 @@
         margin-bottom: 32px;
       }
 
-      .small { width: 60px; height: 60px; }
-      .medium { width: 90px; height: 60px; }
-      .large { width: 120px; height: 60px; }
-      .tall { width: 60px; height: 90px; }
-      .wide { width: 140px; height: 60px; }
+      .grid-item img,
+      .grid-item video {
+        height: 100px;
+      }
+
       .grid-spacer { height: 30px; }
     }
 
