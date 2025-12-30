@@ -146,9 +146,18 @@
 
     .grid {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .grid > div {
+      display: flex;
+      flex-wrap: nowrap;
       gap: var(--gutter);
       align-items: flex-start;
+      overflow-x: auto;
+      width: 100%;
     }
 
     .grid-item {
@@ -159,6 +168,7 @@
       align-items: center;
       justify-content: center;
       height: auto;
+      flex-shrink: 0;
     }
 
     .grid-item img,
@@ -705,12 +715,17 @@
       grid.className = 'grid content-grid';
       rows.forEach(row => {
         if (Array.isArray(row)) {
+          // Create a wrapper div for each row
+          const rowWrapper = document.createElement('div');
           row.forEach(item => {
             const element = createGridItem(item);
             if (element) {
-              grid.appendChild(element);
+              rowWrapper.appendChild(element);
             }
           });
+          if (rowWrapper.children.length > 0) {
+            grid.appendChild(rowWrapper);
+          }
         } else if (row && typeof row.spacer === 'number') {
           const spacer = document.createElement('div');
           spacer.className = 'grid-spacer';
