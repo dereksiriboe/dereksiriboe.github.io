@@ -546,13 +546,19 @@
       subNavContainer.innerHTML = '';
       content.innerHTML = '';
       content.appendChild(homeTemplate.content.cloneNode(true));
-      buildPrimaryNav(null); // Rebuild nav for home page (library only)
+      buildPrimaryNav(null);
+
+      // Show library subsections on home page
+      const librarySection = sectionConfig.find(s => s.id === 'library');
+      if (librarySection && librarySection.subsections.length > 0) {
+        renderSubNav(librarySection, null);
+      }
     }
 
     function renderSubNav(section, activeSubId) {
       subNavContainer.innerHTML = '';
-      // Only show sub-navigation if there are multiple subsections
-      if (section.subsections.length <= 1) {
+      // Show navigation if there are subsections
+      if (section.subsections.length === 0) {
         return;
       }
       const nav = document.createElement('nav');
