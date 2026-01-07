@@ -448,20 +448,13 @@
   </template>
 
   <script>
-    // Initial config - subsections for project and bonus will be loaded dynamically
+    // Initial config - subsections for project will be loaded dynamically
     let sectionConfig = [
       {
         id: 'library',
         label: 'library',
         defaultSubsection: null,
         subsections: []
-      },
-      {
-        id: 'bonus',
-        label: 'bonus',
-        defaultSubsection: null,
-        subsections: [],
-        hideFromHome: true
       }
     ];
 
@@ -483,17 +476,6 @@
             data: `data/${name}.json`
           }));
           librarySection.defaultSubsection = librarySection.subsections[0]?.id || null;
-        }
-
-        // Update bonus subsections
-        if (manifest.bonus && manifest.bonus.length > 0) {
-          const bonusSection = sectionConfig.find(s => s.id === 'bonus');
-          bonusSection.subsections = manifest.bonus.map(name => ({
-            id: `bonus-${name}`,
-            label: name,
-            data: `data/bonus-${name}.json`
-          }));
-          bonusSection.defaultSubsection = bonusSection.subsections[0]?.id || null;
         }
 
         // Rebuild subsection lookup
@@ -531,6 +513,12 @@
 
     function buildPrimaryNav(currentSection = null) {
       primaryNav.innerHTML = '';
+      // Hide primary nav if there's only one section
+      if (sectionConfig.length <= 1) {
+        primaryNav.style.display = 'none';
+        return;
+      }
+      primaryNav.style.display = 'flex';
       sectionConfig.forEach(section => {
         // Skip sections marked to hide from nav
         if (section.hideFromNav) return;
@@ -742,11 +730,6 @@
     async function renderSubsection(target) {
       document.body.classList.add('is-subpage');
       const { section, subsection } = target;
-
-      // Rebuild nav when on library page to show bonus
-      if (section.id === 'library' || section.id === 'bonus') {
-        buildPrimaryNav(section.id);
-      }
 
       setActivePrimary(section.id);
       renderSubNav(section, subsection.id);
