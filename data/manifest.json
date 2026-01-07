@@ -1,8 +1,7 @@
 {
   "project": [
-    "library"
+    "library",
+    "bonus"
   ],
-  "bonus": [
-    "flatlay style"
-  ]
+  "bonus": []
 }
