@@ -146,6 +146,24 @@
       width: 100%;
     }
 
+    .grid > div.carousel-row {
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: var(--gutter);
+      align-items: flex-start;
+      width: max-content;
+      animation: scroll-left var(--scroll-duration, 40s) linear infinite;
+      transform: translateX(0);
+    }
+
+    .carousel-track .is-clone {
+      pointer-events: none;
+    }
+
     .grid-item {
       background: #f5f5f5;
       overflow: hidden;
@@ -407,6 +425,15 @@
       width: 100%;
       height: 1px;
     }
+
+    @keyframes scroll-left {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(calc(-1 * var(--scroll-distance, 100%)));
+      }
+    }
   </style>
 </head>
 <body>
@@ -519,6 +546,9 @@
 
     let currentInfiniteScrollObserver = null;
     let currentInfiniteScrollSentinel = null;
+    const carouselUpdaters = new Set();
+    let carouselResizeBound = false;
+    const carouselScrollSpeed = 40;
 
     function buildPrimaryNav(currentSection = null) {
       primaryNav.innerHTML = '';
@@ -562,6 +592,7 @@
         currentInfiniteScrollSentinel.remove();
         currentInfiniteScrollSentinel = null;
       }
+      carouselUpdaters.clear();
       content.appendChild(homeTemplate.content.cloneNode(true));
       buildPrimaryNav(null);
 
@@ -724,6 +755,50 @@
       return path.split('/').pop().split('.').shift().replace(/[-_]/g, ' ');
     }
 
+    function registerCarouselUpdater(updater) {
+      carouselUpdaters.add(updater);
+      if (!carouselResizeBound) {
+        window.addEventListener('resize', () => {
+          carouselUpdaters.forEach(fn => fn());
+        });
+        carouselResizeBound = true;
+      }
+    }
+
+    function setupCarouselRow(rowWrapper) {
+      rowWrapper.classList.add('carousel-row');
+      const track = document.createElement('div');
+      track.className = 'carousel-track';
+      const items = Array.from(rowWrapper.children);
+      items.forEach(item => track.appendChild(item));
+      items.forEach(item => {
+        const clone = item.cloneNode(true);
+        clone.classList.add('is-clone');
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      });
+      rowWrapper.appendChild(track);
+
+      const updateDuration = () => {
+        if (!track.isConnected) return;
+        const distance = Math.max(track.scrollWidth / 2, 0);
+        if (distance === 0) return;
+        track.style.setProperty('--scroll-distance', `${distance}px`);
+        track.style.setProperty('--scroll-duration', `${distance / carouselScrollSpeed}s`);
+      };
+
+      registerCarouselUpdater(() => requestAnimationFrame(updateDuration));
+      requestAnimationFrame(updateDuration);
+
+      track.querySelectorAll('img, video').forEach(media => {
+        if (media.complete || media.readyState >= 2) {
+          return;
+        }
+        media.addEventListener('load', updateDuration, { once: true });
+        media.addEventListener('loadeddata', updateDuration, { once: true });
+      });
+    }
+
     function renderGrid(rows) {
       const grid = document.createElement('div');
       grid.className = 'grid content-grid';
@@ -731,7 +806,7 @@
       return grid;
     }
 
-    function appendRowsToGrid(grid, rows) {
+    function appendRowsToGrid(grid, rows, { enableCarousel = false } = {}) {
       rows.forEach(row => {
         if (Array.isArray(row)) {
           const rowWrapper = document.createElement('div');
@@ -742,6 +817,9 @@
             }
           });
           if (rowWrapper.children.length > 0) {
+            if (enableCarousel) {
+              setupCarouselRow(rowWrapper);
+            }
             grid.appendChild(rowWrapper);
           }
         } else if (row && typeof row.spacer === 'number') {
@@ -762,7 +840,7 @@
 
       const loadNextBatch = () => {
         const slice = rows.slice(nextIndex, nextIndex + libraryBatchSize);
-        appendRowsToGrid(grid, slice);
+        appendRowsToGrid(grid, slice, { enableCarousel: true });
         nextIndex += slice.length;
 
         if (nextIndex >= rows.length && currentInfiniteScrollObserver) {
@@ -816,6 +894,7 @@
         currentInfiniteScrollSentinel.remove();
         currentInfiniteScrollSentinel = null;
       }
+      carouselUpdaters.clear();
 
       content.appendChild(loadingTemplate.content.cloneNode(true));
       try {
@@ -863,7 +942,9 @@
 
     function openLightbox(src, alt) {
       // Build list of all clickable images on current page
-      currentLightboxImages = Array.from(document.querySelectorAll('.grid-item.clickable img')).map(img => ({
+      currentLightboxImages = Array.from(
+        document.querySelectorAll('.grid-item.clickable:not(.is-clone) img')
+      ).map(img => ({
         src: img.src,
         alt: img.alt
       }));
