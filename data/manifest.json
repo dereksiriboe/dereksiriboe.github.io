@@ -1,7 +1,8 @@
 {
   "project": [
     "library",
-    "bonus"
+    "bonus",
+    "playlists"
   ],
   "bonus": []
 }
