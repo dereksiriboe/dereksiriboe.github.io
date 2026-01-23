@@ -900,7 +900,7 @@
       try {
         const data = await loadSubsectionData(subsection);
         content.innerHTML = '';
-        if (section.id === 'library') {
+        if (section.id === 'library' && subsection.id !== 'playlists') {
           renderLibraryInfiniteScroll(data.rows || []);
         } else {
           content.appendChild(renderGrid(data.rows || []));
