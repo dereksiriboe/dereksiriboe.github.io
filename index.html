@@ -402,6 +402,11 @@
     .grid-item.clickable {
       cursor: zoom-in;
     }
+
+    .grid-sentinel {
+      width: 100%;
+      height: 1px;
+    }
   </style>
 </head>
 <body>
@@ -510,6 +515,10 @@
     const homeTemplate = document.getElementById('home-template');
     const loadingTemplate = document.getElementById('loading-template');
     const errorTemplate = document.getElementById('error-template');
+    const libraryBatchSize = 6;
+
+    let currentInfiniteScrollObserver = null;
+    let currentInfiniteScrollSentinel = null;
 
     function buildPrimaryNav(currentSection = null) {
       primaryNav.innerHTML = '';
@@ -545,6 +554,14 @@
       setActivePrimary(null);
       subNavContainer.innerHTML = '';
       content.innerHTML = '';
+      if (currentInfiniteScrollObserver) {
+        currentInfiniteScrollObserver.disconnect();
+        currentInfiniteScrollObserver = null;
+      }
+      if (currentInfiniteScrollSentinel) {
+        currentInfiniteScrollSentinel.remove();
+        currentInfiniteScrollSentinel = null;
+      }
       content.appendChild(homeTemplate.content.cloneNode(true));
       buildPrimaryNav(null);
 
@@ -710,9 +727,13 @@
     function renderGrid(rows) {
       const grid = document.createElement('div');
       grid.className = 'grid content-grid';
+      appendRowsToGrid(grid, rows);
+      return grid;
+    }
+
+    function appendRowsToGrid(grid, rows) {
       rows.forEach(row => {
         if (Array.isArray(row)) {
-          // Create a wrapper div for each row
           const rowWrapper = document.createElement('div');
           row.forEach(item => {
             const element = createGridItem(item);
@@ -730,7 +751,54 @@
           grid.appendChild(spacer);
         }
       });
-      return grid;
+    }
+
+    function renderLibraryInfiniteScroll(rows) {
+      const grid = document.createElement('div');
+      grid.className = 'grid content-grid';
+      content.appendChild(grid);
+
+      let nextIndex = 0;
+
+      const loadNextBatch = () => {
+        const slice = rows.slice(nextIndex, nextIndex + libraryBatchSize);
+        appendRowsToGrid(grid, slice);
+        nextIndex += slice.length;
+
+        if (nextIndex >= rows.length && currentInfiniteScrollObserver) {
+          currentInfiniteScrollObserver.disconnect();
+          currentInfiniteScrollObserver = null;
+        }
+        if (nextIndex >= rows.length && currentInfiniteScrollSentinel) {
+          currentInfiniteScrollSentinel.remove();
+          currentInfiniteScrollSentinel = null;
+        }
+      };
+
+      loadNextBatch();
+
+      if (!('IntersectionObserver' in window) || rows.length <= libraryBatchSize) {
+        while (nextIndex < rows.length) {
+          loadNextBatch();
+        }
+        return;
+      }
+
+      currentInfiniteScrollSentinel = document.createElement('div');
+      currentInfiniteScrollSentinel.className = 'grid-sentinel';
+      content.appendChild(currentInfiniteScrollSentinel);
+
+      currentInfiniteScrollObserver = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              loadNextBatch();
+            }
+          });
+        },
+        { rootMargin: '200px' }
+      );
+      currentInfiniteScrollObserver.observe(currentInfiniteScrollSentinel);
     }
 
     async function renderSubsection(target) {
@@ -740,12 +808,24 @@
       setActivePrimary(section.id);
       renderSubNav(section, subsection.id);
       content.innerHTML = '';
+      if (currentInfiniteScrollObserver) {
+        currentInfiniteScrollObserver.disconnect();
+        currentInfiniteScrollObserver = null;
+      }
+      if (currentInfiniteScrollSentinel) {
+        currentInfiniteScrollSentinel.remove();
+        currentInfiniteScrollSentinel = null;
+      }
 
       content.appendChild(loadingTemplate.content.cloneNode(true));
       try {
         const data = await loadSubsectionData(subsection);
         content.innerHTML = '';
-        content.appendChild(renderGrid(data.rows || []));
+        if (section.id === 'library') {
+          renderLibraryInfiniteScroll(data.rows || []);
+        } else {
+          content.appendChild(renderGrid(data.rows || []));
+        }
       } catch (error) {
         console.error(error);
         content.innerHTML = '';
