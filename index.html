@@ -562,7 +562,7 @@
         // Skip sections marked to hide from nav
         if (section.hideFromNav) return;
 
-        // On home page, only show library (hide bonus)
+        // On home page, only show featured section links
         if (!currentSection && section.hideFromHome) return;
 
         const link = document.createElement('a');

@@ -149,36 +149,12 @@ echo '  ]' >> "$REPO_DIR/data/library.json"
 echo '}' >> "$REPO_DIR/data/library.json"
 echo "  Created: library.json"
 
-# 3. Generate BONUS photos JSONs
+# 3. Generate manifest.json
 echo ""
-echo "3. Generating bonus data files..."
-generate_json_with_subfolders "$REPO_DIR/images/bonus" "$REPO_DIR/data" "bonus"
-
-# 4. Generate manifest.json
-echo ""
-echo "4. Generating manifest.json..."
+echo "3. Generating manifest.json..."
 echo '{' > "$REPO_DIR/data/manifest.json"
 echo '  "project": [' >> "$REPO_DIR/data/manifest.json"
 echo '    "library"' >> "$REPO_DIR/data/manifest.json"
-echo '  ],' >> "$REPO_DIR/data/manifest.json"
-echo '  "bonus": [' >> "$REPO_DIR/data/manifest.json"
-
-first=true
-for subfolder in "$REPO_DIR/images/bonus"/*; do
-    [ -d "$subfolder" ] || continue
-
-    subfolder_name=$(basename "$subfolder")
-
-    if [ "$first" = true ]; then
-        first=false
-    else
-        echo ',' >> "$REPO_DIR/data/manifest.json"
-    fi
-
-    echo -n "    \"$subfolder_name\"" >> "$REPO_DIR/data/manifest.json"
-done
-
-echo '' >> "$REPO_DIR/data/manifest.json"
 echo '  ]' >> "$REPO_DIR/data/manifest.json"
 echo '}' >> "$REPO_DIR/data/manifest.json"
 

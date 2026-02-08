@@ -103,39 +103,14 @@ echo ""
 echo "2. Syncing PROJECT photos..."
 generate_json_with_subfolders "$DESKTOP_DIR/project" "$REPO_DIR/data" "$REPO_DIR/images/project"
 
-# 3. Sync BONUS photos (subfolders)
+# 3. Generate manifest.json
 echo ""
-echo "3. Syncing BONUS photos..."
-generate_json_with_subfolders "$DESKTOP_DIR/bonus" "$REPO_DIR/data" "$REPO_DIR/images/bonus"
-
-# 4. Generate manifest.json
-echo ""
-echo "4. Generating manifest.json..."
+echo "3. Generating manifest.json..."
 echo '{' > "$REPO_DIR/data/manifest.json"
 echo '  "project": [' >> "$REPO_DIR/data/manifest.json"
 
 first=true
 for subfolder in "$DESKTOP_DIR/project"/*; do
-    [ -d "$subfolder" ] || continue
-    [ "$(basename "$subfolder")" = "README.txt" ] && continue
-
-    subfolder_name=$(basename "$subfolder")
-
-    if [ "$first" = true ]; then
-        first=false
-    else
-        echo ',' >> "$REPO_DIR/data/manifest.json"
-    fi
-
-    echo -n "    \"$subfolder_name\"" >> "$REPO_DIR/data/manifest.json"
-done
-
-echo '' >> "$REPO_DIR/data/manifest.json"
-echo '  ],' >> "$REPO_DIR/data/manifest.json"
-echo '  "bonus": [' >> "$REPO_DIR/data/manifest.json"
-
-first=true
-for subfolder in "$DESKTOP_DIR/bonus"/*; do
     [ -d "$subfolder" ] || continue
     [ "$(basename "$subfolder")" = "README.txt" ] && continue
 
