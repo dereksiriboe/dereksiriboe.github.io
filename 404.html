@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 | Harvest Run</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #f5f4e7;
+      --muted: #cfceb4;
+      --card-bg: rgba(8, 22, 15, 0.74);
+      --card-border: rgba(197, 241, 176, 0.22);
+      --highlight: #b7ff7f;
+      --highlight-strong: #80de4d;
+      --accent: #ffd166;
+      --shadow: rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: clamp(14px, 3vw, 36px);
+      background:
+        radial-gradient(circle at 16% 18%, rgba(178, 255, 136, 0.15) 0%, rgba(178, 255, 136, 0) 42%),
+        radial-gradient(circle at 88% 14%, rgba(255, 198, 93, 0.18) 0%, rgba(255, 198, 93, 0) 36%),
+        linear-gradient(175deg, #0c2417 0%, #1a3d28 34%, #102418 100%);
+      color: var(--ink);
+      font-family: "Space Grotesk", "Avenir Next", "Trebuchet MS", sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 10% 80%, rgba(12, 58, 35, 0.42), transparent 60%),
+        radial-gradient(circle at 84% 32%, rgba(34, 122, 73, 0.36), transparent 54%);
+      filter: blur(40px);
+      pointer-events: none;
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+
+    .layout {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+      animation: settle 520ms ease-out;
+    }
+
+    .topline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px 14px;
+      padding: 0 4px;
+    }
+
+    .badge {
+      margin: 0;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--highlight);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Outfit", "Gill Sans", sans-serif;
+      font-size: clamp(1.75rem, 4.2vw, 2.9rem);
+      line-height: 1.03;
+      letter-spacing: 0.02em;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 2.1vw, 1.06rem);
+      max-width: 58ch;
+    }
+
+    .game-card {
+      position: relative;
+      border-radius: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 28px 58px -36px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(4px);
+      padding: clamp(10px, 2vw, 16px);
+      overflow: hidden;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hud-block {
+      border-radius: 12px;
+      border: 1px solid rgba(201, 255, 172, 0.22);
+      background: rgba(6, 16, 11, 0.46);
+      padding: 8px 10px;
+      min-height: 58px;
+      display: grid;
+      align-content: center;
+      gap: 2px;
+    }
+
+    .hud-label {
+      margin: 0;
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: #a7c99a;
+    }
+
+    .hud-value {
+      margin: 0;
+      font-size: 1.13rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 7;
+      display: block;
+      border-radius: 14px;
+      border: 1px solid rgba(212, 255, 193, 0.24);
+      background: #132d1f;
+      touch-action: manipulation;
+    }
+
+    .assist {
+      margin: 8px 4px 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 88px 16px 46px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: rgba(4, 15, 9, 0.76);
+      border: 1px solid rgba(186, 255, 150, 0.17);
+      border-radius: 14px;
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      transition: opacity 180ms ease, visibility 180ms ease;
+    }
+
+    .overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .overlay h2 {
+      margin: 0;
+      font-family: "Outfit", "Gill Sans", sans-serif;
+      font-size: clamp(1.24rem, 3vw, 2rem);
+      letter-spacing: 0.01em;
+    }
+
+    .overlay p {
+      margin: 8px 0 0;
+      color: #d3dfc6;
+      max-width: 36ch;
+      line-height: 1.45;
+    }
+
+    .overlay button {
+      margin-top: 16px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--highlight), var(--highlight-strong));
+      color: #102415;
+      font-family: "Space Grotesk", "Avenir Next", sans-serif;
+      font-weight: 700;
+      padding: 10px 18px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px -14px rgba(147, 230, 88, 0.85);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .overlay button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 35px -16px rgba(157, 255, 95, 0.92);
+    }
+
+    .back-home {
+      justify-self: start;
+      margin-left: 4px;
+      text-decoration: none;
+      color: var(--accent);
+      font-size: 0.92rem;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255, 209, 102, 0.36);
+      transition: color 120ms ease, border-color 120ms ease;
+    }
+
+    .back-home:hover {
+      color: #ffe4a2;
+      border-color: rgba(255, 228, 162, 0.74);
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(-10px, 0, 0) scale(1);
+      }
+      to {
+        transform: translate3d(12px, -7px, 0) scale(1.04);
+      }
+    }
+
+    @keyframes settle {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .hud {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .overlay {
+        inset: 138px 10px 54px;
+      }
+
+      .assist {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <div class="topline">
+      <p class="badge">404 Error</p>
+      <h1>Field Not Found</h1>
+      <p class="lead">Wrong turn. While this page is missing, you can still do one thing: run the field and harvest every plant you can.</p>
+    </div>
+
+    <section class="game-card" aria-label="Harvest mini game">
+      <div class="hud">
+        <article class="hud-block">
+          <p class="hud-label">Harvested</p>
+          <p class="hud-value" id="scoreValue">0</p>
+        </article>
+        <article class="hud-block">
+          <p class="hud-label">Best Run</p>
+          <p class="hud-value" id="bestValue">0</p>
+        </article>
+        <article class="hud-block">
+          <p class="hud-label">Missed</p>
+          <p class="hud-value" id="missValue">0/8</p>
+        </article>
+        <article class="hud-block">
+          <p class="hud-label">Speed</p>
+          <p class="hud-value" id="speedValue">1.0x</p>
+        </article>
+      </div>
+
+      <canvas id="harvestCanvas" width="960" height="420" aria-label="Side scrolling harvest game"></canvas>
+      <p class="assist">Controls: <strong>Space</strong>/<strong>Up</strong>/<strong>Tap</strong> to jump, <strong>Esc</strong> to pause, <strong>R</strong> to restart.</p>
+
+      <div class="overlay" id="overlay">
+        <div>
+          <h2 id="overlayTitle">Harvest Run</h2>
+          <p id="overlayBody">Jump to collect plants. Missing 8 ends your run.</p>
+          <button id="overlayAction" type="button">Start Harvest</button>
+        </div>
+      </div>
+    </section>
+
+    <a class="back-home" href="/">Return to home page</a>
+  </main>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("harvestCanvas");
+      const context = canvas.getContext("2d");
+      if (!context) {
+        return;
+      }
+
+      const scoreValue = document.getElementById("scoreValue");
+      const bestValue = document.getElementById("bestValue");
+      const missValue = document.getElementById("missValue");
+      const speedValue = document.getElementById("speedValue");
+
+      const overlay = document.getElementById("overlay");
+      const overlayTitle = document.getElementById("overlayTitle");
+      const overlayBody = document.getElementById("overlayBody");
+      const overlayAction = document.getElementById("overlayAction");
+
+      const world = {
+        width: canvas.width,
+        height: canvas.height,
+        groundY: 320,
+        missLimit: 8,
+      };
+
+      const config = {
+        gravity: 0.78,
+        jumpVelocity: -15,
+        baseSpeed: 5.2,
+        maxSpeed: 11.4,
+      };
+
+      const player = {
+        x: 122,
+        y: world.groundY - 66,
+        width: 48,
+        height: 66,
+        vy: 0,
+        onGround: true,
+      };
+
+      const clouds = createClouds();
+      const plants = [];
+      const particles = [];
+
+      let frame = 0;
+      let spawnClock = 0;
+      let nextSpawnIn = random(52, 98);
+      let harvested = 0;
+      let missed = 0;
+      let speed = config.baseSpeed;
+      let running = false;
+      let paused = false;
+      let lastTime = performance.now();
+      let best = loadBest();
+
+      renderHud();
+      setOverlay("Harvest Run", "Jump to collect plants. Missing 8 ends your run.", "Start Harvest", true);
+
+      function loadBest() {
+        try {
+          const raw = window.localStorage.getItem("harvest-404-best");
+          const numeric = Number(raw);
+          return Number.isFinite(numeric) && numeric > 0 ? Math.floor(numeric) : 0;
+        } catch (error) {
+          return 0;
+        }
+      }
+
+      function saveBest(value) {
+        try {
+          window.localStorage.setItem("harvest-404-best", String(value));
+        } catch (error) {
+          return;
+        }
+      }
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function createClouds() {
+        return Array.from({ length: 6 }, () => ({
+          x: random(0, world.width),
+          y: random(48, 170),
+          size: random(28, 62),
+          speed: random(0.18, 0.4),
+        }));
+      }
+
+      function createPlant() {
+        const high = Math.random() < 0.32;
+        const width = high ? 30 : 24;
+        const height = high ? 100 : 66;
+        const y = high ? world.groundY - height - 46 : world.groundY - height;
+        return {
+          x: world.width + 30,
+          y,
+          width,
+          height,
+          bob: random(0, Math.PI * 2),
+          wobble: random(0.035, 0.08),
+        };
+      }
+
+      function resetRun() {
+        plants.length = 0;
+        particles.length = 0;
+        frame = 0;
+        spawnClock = 0;
+        nextSpawnIn = random(52, 98);
+        harvested = 0;
+        missed = 0;
+        speed = config.baseSpeed;
+        player.y = world.groundY - player.height;
+        player.vy = 0;
+        player.onGround = true;
+        renderHud();
+      }
+
+      function setOverlay(title, message, buttonText, show) {
+        overlayTitle.textContent = title;
+        overlayBody.textContent = message;
+        overlayAction.textContent = buttonText;
+        overlay.classList.toggle("is-hidden", !show);
+      }
+
+      function startRun() {
+        if (running && !paused) {
+          return;
+        }
+
+        if (!paused) {
+          resetRun();
+        }
+
+        running = true;
+        paused = false;
+        setOverlay("", "", "", false);
+      }
+
+      function pauseRun() {
+        if (!running) {
+          return;
+        }
+        running = false;
+        paused = true;
+        setOverlay("Paused", "Press Space, Up, or the button to continue.", "Resume", true);
+      }
+
+      function endRun() {
+        running = false;
+        paused = false;
+
+        if (harvested > best) {
+          best = harvested;
+          saveBest(best);
+        }
+
+        const noun = harvested === 1 ? "plant" : "plants";
+        setOverlay(
+          "Run Complete",
+          "You harvested " + harvested + " " + noun + ". Missed " + missed + ". Hit start to run it back.",
+          "Play Again",
+          true
+        );
+      }
+
+      function jump() {
+        if (!running && !paused) {
+          startRun();
+        } else if (paused) {
+          startRun();
+          return;
+        }
+
+        if (!player.onGround) {
+          return;
+        }
+
+        player.vy = config.jumpVelocity;
+        player.onGround = false;
+
+        for (let i = 0; i < 6; i += 1) {
+          particles.push({
+            x: player.x + random(8, 26),
+            y: world.groundY + random(2, 9),
+            vx: random(-1.2, 1.6),
+            vy: random(-2.6, -0.6),
+            life: random(20, 34),
+            color: i % 2 === 0 ? "#5d8e53" : "#9ad07f",
+            size: random(2, 4),
+          });
+        }
+      }
+
+      function harvestPlant(plant) {
+        harvested += 1;
+        if (harvested > best) {
+          best = harvested;
+          saveBest(best);
+        }
+
+        for (let i = 0; i < 12; i += 1) {
+          particles.push({
+            x: plant.x + plant.width * 0.5,
+            y: plant.y + random(8, plant.height - 10),
+            vx: random(-2.8, 2.6),
+            vy: random(-3.4, 0.2),
+            life: random(20, 44),
+            color: i % 3 === 0 ? "#f8d15d" : "#97d96a",
+            size: random(2, 4.2),
+          });
+        }
+      }
+
+      function intersects(a, b) {
+        return a.x < b.x + b.width &&
+          a.x + a.width > b.x &&
+          a.y < b.y + b.height &&
+          a.y + a.height > b.y;
+      }
+
+      function playerBox() {
+        return {
+          x: player.x + 8,
+          y: player.y + 7,
+          width: player.width - 16,
+          height: player.height - 8,
+        };
+      }
+
+      function plantBox(plant) {
+        return {
+          x: plant.x + 4,
+          y: plant.y + 6,
+          width: plant.width - 8,
+          height: plant.height - 10,
+        };
+      }
+
+      function renderHud() {
+        scoreValue.textContent = String(harvested);
+        bestValue.textContent = String(best);
+        missValue.textContent = missed + "/" + world.missLimit;
+        speedValue.textContent = (speed / config.baseSpeed).toFixed(1) + "x";
+      }
+
+      function drawLeaf(x, y, size, angle, color) {
+        context.save();
+        context.translate(x, y);
+        context.rotate(angle);
+        context.fillStyle = color;
+        context.beginPath();
+        context.moveTo(0, -size);
+        context.quadraticCurveTo(size * 0.65, -size * 0.25, 0, size * 0.9);
+        context.quadraticCurveTo(-size * 0.65, -size * 0.25, 0, -size);
+        context.fill();
+        context.restore();
+      }
+
+      function drawPlant(plant) {
+        const sway = Math.sin(plant.bob) * 4;
+        const stemX = plant.x + plant.width * 0.5 + sway * 0.2;
+
+        context.lineCap = "round";
+        context.strokeStyle = "#2d8a4f";
+        context.lineWidth = 4;
+        context.beginPath();
+        context.moveTo(stemX, plant.y + plant.height);
+        context.quadraticCurveTo(stemX + sway, plant.y + plant.height * 0.45, stemX - sway * 0.2, plant.y + 8);
+        context.stroke();
+
+        const leafColor = "#48b565";
+        drawLeaf(stemX - 10 + sway * 0.45, plant.y + plant.height * 0.6, 10, -1.18, leafColor);
+        drawLeaf(stemX + 10 + sway * 0.45, plant.y + plant.height * 0.58, 10, 1.12, leafColor);
+        drawLeaf(stemX - 8 + sway * 0.4, plant.y + plant.height * 0.38, 9, -1.32, "#4fc97b");
+        drawLeaf(stemX + 8 + sway * 0.4, plant.y + plant.height * 0.36, 9, 1.27, "#4fc97b");
+        drawLeaf(stemX + sway * 0.2, plant.y + 14, 11, 0, "#68cf7f");
+
+        context.fillStyle = "#e6ba59";
+        context.beginPath();
+        context.arc(stemX + sway * 0.3, plant.y + 8, 4, 0, Math.PI * 2);
+        context.arc(stemX - 4 + sway * 0.3, plant.y + 13, 3.2, 0, Math.PI * 2);
+        context.arc(stemX + 4 + sway * 0.3, plant.y + 13, 3.2, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      function drawPlayer() {
+        const runCycle = Math.sin(frame * 0.4);
+        const x = player.x;
+        const y = player.y;
+
+        context.fillStyle = "rgba(3, 9, 6, 0.34)";
+        context.beginPath();
+        context.ellipse(x + player.width * 0.5, world.groundY + 5, 22, 7, 0, 0, Math.PI * 2);
+        context.fill();
+
+        context.fillStyle = "#f0c27b";
+        context.beginPath();
+        context.arc(x + 24, y + 12, 8, 0, Math.PI * 2);
+        context.fill();
+
+        context.fillStyle = "#3a2215";
+        context.fillRect(x + 13, y + 7, 22, 4);
+
+        context.fillStyle = "#ffb657";
+        context.fillRect(x + 14, y + 20, 18, 23);
+
+        context.strokeStyle = "#2c1a12";
+        context.lineWidth = 4;
+        context.lineCap = "round";
+
+        context.beginPath();
+        context.moveTo(x + 20, y + 44);
+        context.lineTo(x + 16 + runCycle * 3.4, y + 60);
+        context.stroke();
+
+        context.beginPath();
+        context.moveTo(x + 27, y + 44);
+        context.lineTo(x + 30 - runCycle * 3.4, y + 60);
+        context.stroke();
+
+        context.fillStyle = "#5f422f";
+        context.fillRect(x + 7, y + 33, 10, 9);
+
+        context.fillStyle = "#d8a364";
+        context.fillRect(x + 30, y + 28, 12, 10);
+        context.strokeStyle = "#8e663e";
+        context.lineWidth = 2;
+        context.strokeRect(x + 30, y + 28, 12, 10);
+      }
+
+      function drawBackground() {
+        const sky = context.createLinearGradient(0, 0, 0, world.height);
+        sky.addColorStop(0, "#122f1f");
+        sky.addColorStop(0.58, "#254f33");
+        sky.addColorStop(1, "#2f653f");
+        context.fillStyle = sky;
+        context.fillRect(0, 0, world.width, world.height);
+
+        context.fillStyle = "rgba(255, 199, 114, 0.14)";
+        context.beginPath();
+        context.arc(world.width - 118, 84, 60, 0, Math.PI * 2);
+        context.fill();
+
+        for (const cloud of clouds) {
+          context.fillStyle = "rgba(218, 247, 206, 0.22)";
+          context.beginPath();
+          context.ellipse(cloud.x, cloud.y, cloud.size, cloud.size * 0.48, 0, 0, Math.PI * 2);
+          context.ellipse(cloud.x + cloud.size * 0.45, cloud.y + 2, cloud.size * 0.75, cloud.size * 0.4, 0, 0, Math.PI * 2);
+          context.ellipse(cloud.x - cloud.size * 0.42, cloud.y + 3, cloud.size * 0.62, cloud.size * 0.38, 0, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        drawHillLayer("#183f29", 286, 18, 0.018, frame * 0.44);
+        drawHillLayer("#1f5636", 300, 24, 0.015, frame * 0.34);
+      }
+
+      function drawHillLayer(color, baseline, amplitude, frequency, offset) {
+        context.fillStyle = color;
+        context.beginPath();
+        context.moveTo(0, world.height);
+
+        for (let x = 0; x <= world.width; x += 10) {
+          const y = baseline + Math.sin((x + offset) * frequency) * amplitude;
+          context.lineTo(x, y);
+        }
+
+        context.lineTo(world.width, world.height);
+        context.closePath();
+        context.fill();
+      }
+
+      function drawGround() {
+        context.fillStyle = "#244f32";
+        context.fillRect(0, world.groundY, world.width, world.height - world.groundY);
+
+        const stripeOffset = (frame * speed * 3.4) % 42;
+        context.strokeStyle = "rgba(32, 104, 63, 0.68)";
+        context.lineWidth = 2;
+
+        for (let x = -50; x < world.width + 42; x += 42) {
+          context.beginPath();
+          context.moveTo(x - stripeOffset, world.groundY + 4);
+          context.lineTo(x + 26 - stripeOffset, world.height);
+          context.stroke();
+        }
+
+        context.fillStyle = "rgba(190, 234, 158, 0.17)";
+        for (let x = 0; x <= world.width; x += 26) {
+          const bladeHeight = 3 + (x % 7);
+          context.fillRect(x - (frame * speed * 2.2) % 26, world.groundY - bladeHeight, 2, bladeHeight);
+        }
+      }
+
+      function updateClouds(delta) {
+        for (const cloud of clouds) {
+          cloud.x -= cloud.speed * delta;
+          if (cloud.x < -120) {
+            cloud.x = world.width + random(30, 120);
+            cloud.y = random(45, 170);
+            cloud.size = random(26, 62);
+          }
+        }
+      }
+
+      function updateParticles(delta) {
+        for (let i = particles.length - 1; i >= 0; i -= 1) {
+          const particle = particles[i];
+          particle.x += particle.vx * delta;
+          particle.y += particle.vy * delta;
+          particle.vy += 0.12 * delta;
+          particle.life -= delta;
+
+          if (particle.life <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+      }
+
+      function drawParticles() {
+        for (const particle of particles) {
+          context.fillStyle = particle.color;
+          context.globalAlpha = Math.max(0, particle.life / 40);
+          context.beginPath();
+          context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          context.fill();
+        }
+        context.globalAlpha = 1;
+      }
+
+      function updateGame(delta) {
+        updateClouds(delta);
+        updateParticles(delta);
+
+        if (!running) {
+          return;
+        }
+
+        frame += delta;
+        speed = Math.min(config.maxSpeed, speed + 0.0019 * delta);
+
+        spawnClock += delta;
+        if (spawnClock > nextSpawnIn) {
+          plants.push(createPlant());
+          spawnClock = 0;
+          nextSpawnIn = random(54, 106) / Math.max(1, speed / config.baseSpeed);
+        }
+
+        player.vy += config.gravity * delta;
+        player.y += player.vy * delta;
+        if (player.y >= world.groundY - player.height) {
+          player.y = world.groundY - player.height;
+          player.vy = 0;
+          player.onGround = true;
+        }
+
+        for (let i = plants.length - 1; i >= 0; i -= 1) {
+          const plant = plants[i];
+          plant.x -= speed * 4.2 * delta;
+          plant.bob += plant.wobble * delta;
+
+          if (intersects(playerBox(), plantBox(plant))) {
+            harvestPlant(plant);
+            plants.splice(i, 1);
+            continue;
+          }
+
+          if (plant.x + plant.width < 0) {
+            missed += 1;
+            plants.splice(i, 1);
+            if (missed >= world.missLimit) {
+              endRun();
+            }
+          }
+        }
+
+        renderHud();
+      }
+
+      function drawGame() {
+        drawBackground();
+        drawGround();
+
+        for (const plant of plants) {
+          drawPlant(plant);
+        }
+
+        drawPlayer();
+        drawParticles();
+      }
+
+      function loop(timestamp) {
+        const delta = Math.min((timestamp - lastTime) / 16.6667, 2);
+        lastTime = timestamp;
+
+        updateGame(delta);
+        drawGame();
+        requestAnimationFrame(loop);
+      }
+
+      function onActionKey(event) {
+        if (event.code === "Space" || event.code === "ArrowUp") {
+          event.preventDefault();
+          jump();
+          return;
+        }
+
+        if (event.code === "Escape") {
+          event.preventDefault();
+          if (running) {
+            pauseRun();
+          } else if (paused) {
+            startRun();
+          }
+          return;
+        }
+
+        if (event.code === "KeyR") {
+          event.preventDefault();
+          paused = false;
+          running = false;
+          startRun();
+        }
+      }
+
+      window.addEventListener("keydown", onActionKey);
+      canvas.addEventListener("pointerdown", jump);
+      overlayAction.addEventListener("click", startRun);
+
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
