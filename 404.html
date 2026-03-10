@@ -288,18 +288,18 @@
           <p class="hud-value" id="missValue">0/8</p>
         </article>
         <article class="hud-block">
-          <p class="hud-label">Speed</p>
-          <p class="hud-value" id="speedValue">1.0x</p>
+          <p class="hud-label">Mode</p>
+          <p class="hud-value" id="modeValue">Waiting</p>
         </article>
       </div>
 
       <canvas id="harvestCanvas" width="960" height="420" aria-label="Side scrolling harvest game"></canvas>
-      <p class="assist">Controls: <strong>Space</strong>/<strong>Up</strong>/<strong>Tap</strong> to jump, <strong>Esc</strong> to pause, <strong>R</strong> to restart.</p>
+      <p class="assist">Controls: <strong>Space</strong>/<strong>Up</strong>/<strong>H</strong>/<strong>Tap</strong> to harvest in-zone, <strong>Esc</strong> to pause, <strong>R</strong> to restart.</p>
 
       <div class="overlay" id="overlay">
         <div>
           <h2 id="overlayTitle">Harvest Run</h2>
-          <p id="overlayBody">Jump to collect plants. Missing 8 ends your run.</p>
+          <p id="overlayBody">Harvest plants when they enter the zone. Each successful cut goes close-up.</p>
           <button id="overlayAction" type="button">Start Harvest</button>
         </div>
       </div>
@@ -319,7 +319,7 @@
       const scoreValue = document.getElementById("scoreValue");
       const bestValue = document.getElementById("bestValue");
       const missValue = document.getElementById("missValue");
-      const speedValue = document.getElementById("speedValue");
+      const modeValue = document.getElementById("modeValue");
 
       const overlay = document.getElementById("overlay");
       const overlayTitle = document.getElementById("overlayTitle");
@@ -331,13 +331,14 @@
         height: canvas.height,
         groundY: 320,
         missLimit: 8,
+        zoneStart: 172,
+        zoneEnd: 226,
       };
 
       const config = {
-        gravity: 0.78,
-        jumpVelocity: -15,
-        baseSpeed: 5.2,
-        maxSpeed: 11.4,
+        baseSpeed: 4.9,
+        maxSpeed: 10.6,
+        harvestDuration: 48,
       };
 
       const player = {
@@ -345,8 +346,6 @@
         y: world.groundY - 66,
         width: 48,
         height: 66,
-        vy: 0,
-        onGround: true,
       };
 
       const clouds = createClouds();
@@ -355,7 +354,7 @@
 
       let frame = 0;
       let spawnClock = 0;
-      let nextSpawnIn = random(52, 98);
+      let nextSpawnIn = random(56, 104);
       let harvested = 0;
       let missed = 0;
       let speed = config.baseSpeed;
@@ -363,9 +362,16 @@
       let paused = false;
       let lastTime = performance.now();
       let best = loadBest();
+      let activeHarvest = null;
+      let zoneFlash = 0;
 
       renderHud();
-      setOverlay("Harvest Run", "Jump to collect plants. Missing 8 ends your run.", "Start Harvest", true);
+      setOverlay(
+        "Close-Up Harvest Run",
+        "Harvest plants when they enter the zone. Every successful cut zooms in for a close-up.",
+        "Start Harvest",
+        true
+      );
 
       function loadBest() {
         try {
@@ -389,6 +395,10 @@
         return Math.random() * (max - min) + min;
       }
 
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
       function createClouds() {
         return Array.from({ length: 6 }, () => ({
           x: random(0, world.width),
@@ -399,17 +409,17 @@
       }
 
       function createPlant() {
-        const high = Math.random() < 0.32;
-        const width = high ? 30 : 24;
-        const height = high ? 100 : 66;
-        const y = high ? world.groundY - height - 46 : world.groundY - height;
+        const width = random(24, 32);
+        const height = random(74, 108);
+        const y = world.groundY - height;
         return {
-          x: world.width + 30,
+          x: world.width + random(10, 42),
           y,
           width,
           height,
           bob: random(0, Math.PI * 2),
           wobble: random(0.035, 0.08),
+          locked: false,
         };
       }
 
@@ -418,13 +428,12 @@
         particles.length = 0;
         frame = 0;
         spawnClock = 0;
-        nextSpawnIn = random(52, 98);
+        nextSpawnIn = random(56, 104);
         harvested = 0;
         missed = 0;
         speed = config.baseSpeed;
-        player.y = world.groundY - player.height;
-        player.vy = 0;
-        player.onGround = true;
+        activeHarvest = null;
+        zoneFlash = 0;
         renderHud();
       }
 
@@ -435,12 +444,82 @@
         overlay.classList.toggle("is-hidden", !show);
       }
 
-      function startRun() {
+      function harvestCandidate() {
+        if (activeHarvest) {
+          return activeHarvest.plant;
+        }
+
+        let candidate = null;
+        let nearest = Number.POSITIVE_INFINITY;
+        const zoneMid = (world.zoneStart + world.zoneEnd) * 0.5;
+
+        for (const plant of plants) {
+          if (plant.locked) {
+            continue;
+          }
+          if (plant.x + plant.width >= world.zoneStart && plant.x <= world.zoneEnd) {
+            const plantMid = plant.x + plant.width * 0.5;
+            const distance = Math.abs(plantMid - zoneMid);
+            if (distance < nearest) {
+              nearest = distance;
+              candidate = plant;
+            }
+          }
+        }
+
+        return candidate;
+      }
+
+      function currentModeText() {
+        if (!running) {
+          return paused ? "Paused" : "Waiting";
+        }
+        if (activeHarvest) {
+          return "Close-up";
+        }
+        if (harvestCandidate()) {
+          return "Ready";
+        }
+        return "Run " + (speed / config.baseSpeed).toFixed(1) + "x";
+      }
+
+      function renderHud() {
+        scoreValue.textContent = String(harvested);
+        bestValue.textContent = String(best);
+        missValue.textContent = missed + "/" + world.missLimit;
+        modeValue.textContent = currentModeText();
+      }
+
+      function emitParticles(x, y, count, primaryColor, secondaryColor) {
+        for (let i = 0; i < count; i += 1) {
+          particles.push({
+            x: x + random(-7, 7),
+            y: y + random(-6, 6),
+            vx: random(-2.8, 2.6),
+            vy: random(-3.2, 0.4),
+            life: random(18, 42),
+            color: i % 3 === 0 ? secondaryColor : primaryColor,
+            size: random(2, 4.2),
+          });
+        }
+      }
+
+      function flashZone() {
+        zoneFlash = 18;
+        emitParticles((world.zoneStart + world.zoneEnd) * 0.5, world.groundY - 64, 6, "#b3d2a6", "#e9f6df");
+      }
+
+      function startRun(forceReset = false) {
+        if (forceReset) {
+          running = false;
+          paused = false;
+        }
+
         if (running && !paused) {
           return;
         }
 
-        if (!paused) {
+        if (!paused || forceReset) {
           resetRun();
         }
 
@@ -450,7 +529,7 @@
       }
 
       function pauseRun() {
-        if (!running) {
+        if (!running || activeHarvest) {
           return;
         }
         running = false;
@@ -461,6 +540,7 @@
       function endRun() {
         running = false;
         paused = false;
+        activeHarvest = null;
 
         if (harvested > best) {
           best = harvested;
@@ -470,90 +550,86 @@
         const noun = harvested === 1 ? "plant" : "plants";
         setOverlay(
           "Run Complete",
-          "You harvested " + harvested + " " + noun + ". Missed " + missed + ". Hit start to run it back.",
+          "You harvested " + harvested + " " + noun + " in close-up mode. Missed " + missed + ". Hit start to run it back.",
           "Play Again",
           true
         );
+        renderHud();
       }
 
-      function jump() {
-        if (!running && !paused) {
-          startRun();
-        } else if (paused) {
-          startRun();
+      function beginHarvest(plant) {
+        plant.locked = true;
+        plant.x = clamp(plant.x, world.zoneStart + 8, world.zoneEnd - plant.width - 8);
+        activeHarvest = {
+          plant,
+          timer: 0,
+          duration: config.harvestDuration + random(-6, 7),
+        };
+
+        emitParticles(
+          plant.x + plant.width * 0.5,
+          plant.y + plant.height * 0.48,
+          10,
+          "#8ed966",
+          "#f8d15d"
+        );
+      }
+
+      function finishHarvest() {
+        if (!activeHarvest) {
           return;
         }
 
-        if (!player.onGround) {
-          return;
+        const plant = activeHarvest.plant;
+        const index = plants.indexOf(plant);
+        if (index >= 0) {
+          plants.splice(index, 1);
         }
 
-        player.vy = config.jumpVelocity;
-        player.onGround = false;
-
-        for (let i = 0; i < 6; i += 1) {
-          particles.push({
-            x: player.x + random(8, 26),
-            y: world.groundY + random(2, 9),
-            vx: random(-1.2, 1.6),
-            vy: random(-2.6, -0.6),
-            life: random(20, 34),
-            color: i % 2 === 0 ? "#5d8e53" : "#9ad07f",
-            size: random(2, 4),
-          });
-        }
-      }
-
-      function harvestPlant(plant) {
         harvested += 1;
         if (harvested > best) {
           best = harvested;
           saveBest(best);
         }
 
-        for (let i = 0; i < 12; i += 1) {
-          particles.push({
-            x: plant.x + plant.width * 0.5,
-            y: plant.y + random(8, plant.height - 10),
-            vx: random(-2.8, 2.6),
-            vy: random(-3.4, 0.2),
-            life: random(20, 44),
-            color: i % 3 === 0 ? "#f8d15d" : "#97d96a",
-            size: random(2, 4.2),
-          });
+        emitParticles(
+          plant.x + plant.width * 0.5,
+          plant.y + plant.height * 0.3,
+          14,
+          "#9fe170",
+          "#ffd56f"
+        );
+
+        activeHarvest = null;
+        spawnClock = 0;
+        speed = Math.min(config.maxSpeed, config.baseSpeed + harvested * 0.24 + frame * 0.0012);
+        nextSpawnIn = random(44, 92) / Math.max(1, speed / config.baseSpeed);
+        renderHud();
+      }
+
+      function attemptHarvest() {
+        if (!running && !paused) {
+          startRun(false);
+          return;
         }
-      }
 
-      function intersects(a, b) {
-        return a.x < b.x + b.width &&
-          a.x + a.width > b.x &&
-          a.y < b.y + b.height &&
-          a.y + a.height > b.y;
-      }
+        if (paused) {
+          startRun(false);
+          return;
+        }
 
-      function playerBox() {
-        return {
-          x: player.x + 8,
-          y: player.y + 7,
-          width: player.width - 16,
-          height: player.height - 8,
-        };
-      }
+        if (!running || activeHarvest) {
+          return;
+        }
 
-      function plantBox(plant) {
-        return {
-          x: plant.x + 4,
-          y: plant.y + 6,
-          width: plant.width - 8,
-          height: plant.height - 10,
-        };
-      }
+        const plant = harvestCandidate();
+        if (!plant) {
+          flashZone();
+          return;
+        }
 
-      function renderHud() {
-        scoreValue.textContent = String(harvested);
-        bestValue.textContent = String(best);
-        missValue.textContent = missed + "/" + world.missLimit;
-        speedValue.textContent = (speed / config.baseSpeed).toFixed(1) + "x";
+        beginHarvest(plant);
+        renderHud();
       }
 
       function drawLeaf(x, y, size, angle, color) {
@@ -569,9 +645,16 @@
         context.restore();
       }
 
-      function drawPlant(plant) {
+      function drawPlant(plant, highlighted) {
         const sway = Math.sin(plant.bob) * 4;
         const stemX = plant.x + plant.width * 0.5 + sway * 0.2;
+
+        if (highlighted) {
+          context.fillStyle = activeHarvest ? "rgba(255, 209, 102, 0.28)" : "rgba(183, 255, 127, 0.24)";
+          context.beginPath();
+          context.ellipse(stemX, plant.y + plant.height * 0.52, 18, 42, 0, 0, Math.PI * 2);
+          context.fill();
+        }
 
         context.lineCap = "round";
         context.strokeStyle = "#2d8a4f";
@@ -596,7 +679,7 @@
         context.fill();
       }
 
-      function drawPlayer() {
+      function drawPlayer(readyToHarvest) {
         const runCycle = Math.sin(frame * 0.4);
         const x = player.x;
         const y = player.y;
@@ -639,6 +722,33 @@
         context.strokeStyle = "#8e663e";
         context.lineWidth = 2;
         context.strokeRect(x + 30, y + 28, 12, 10);
+
+        context.strokeStyle = "#8d6a43";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(x + 30, y + 31);
+        context.lineTo(x + 37, y + 36 + runCycle * 0.6);
+        context.stroke();
+
+        const reach = activeHarvest ? 13 : readyToHarvest ? 5 : 0;
+        const clipperX = x + 37 + reach;
+        const clipperY = y + 36 + runCycle * 0.6;
+
+        context.strokeStyle = "#8d6a43";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(x + 30, y + 31);
+        context.lineTo(clipperX - 2, clipperY);
+        context.stroke();
+
+        context.strokeStyle = "#d7e3da";
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(clipperX - 3, clipperY - 3);
+        context.lineTo(clipperX + 4, clipperY - 8);
+        context.moveTo(clipperX - 3, clipperY + 3);
+        context.lineTo(clipperX + 4, clipperY + 8);
+        context.stroke();
       }
 
       function drawBackground() {
@@ -704,6 +814,108 @@
         }
       }
 
+      function drawHarvestZone(ready) {
+        const zoneHeight = 132;
+        const zoneTop = world.groundY - zoneHeight;
+        const pulse = Math.sin(frame * 0.2) * 0.12 + 0.12;
+        const flashBoost = zoneFlash > 0 ? zoneFlash / 18 : 0;
+        const alpha = clamp((ready ? 0.55 + pulse : 0.24) + flashBoost * 0.4, 0.2, 0.95);
+
+        context.save();
+        context.setLineDash([7, 6]);
+        context.lineWidth = 2;
+        context.strokeStyle = ready
+          ? "rgba(183, 255, 127, " + alpha.toFixed(3) + ")"
+          : "rgba(216, 232, 209, " + alpha.toFixed(3) + ")";
+        context.strokeRect(world.zoneStart, zoneTop, world.zoneEnd - world.zoneStart, zoneHeight);
+        context.setLineDash([]);
+
+        context.fillStyle = ready ? "rgba(183, 255, 127, 0.15)" : "rgba(216, 232, 209, 0.08)";
+        context.fillRect(world.zoneStart, zoneTop, world.zoneEnd - world.zoneStart, zoneHeight);
+
+        context.textAlign = "center";
+        context.font = "700 12px 'Space Grotesk', sans-serif";
+        context.fillStyle = ready ? "#ddffc8" : "#c8d8c2";
+        context.fillText(
+          ready ? "HARVEST NOW" : "HARVEST ZONE",
+          (world.zoneStart + world.zoneEnd) * 0.5,
+          zoneTop - 8
+        );
+        context.restore();
+      }
+
+      function roundedRect(x, y, width, height, radius) {
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+        context.closePath();
+      }
+
+      function drawCloseUpOverlay() {
+        if (!activeHarvest) {
+          return;
+        }
+
+        const progress = clamp(activeHarvest.timer / activeHarvest.duration, 0, 1);
+        const panelWidth = 292;
+        const panelHeight = 74;
+        const panelX = (world.width - panelWidth) * 0.5;
+        const panelY = 24;
+
+        context.save();
+        const vignette = context.createRadialGradient(
+          world.width * 0.5,
+          world.height * 0.46,
+          90,
+          world.width * 0.5,
+          world.height * 0.46,
+          world.width * 0.65
+        );
+        vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+        vignette.addColorStop(1, "rgba(3, 10, 6, 0.45)");
+        context.fillStyle = vignette;
+        context.fillRect(0, 0, world.width, world.height);
+
+        context.fillStyle = "rgba(7, 19, 12, 0.74)";
+        context.strokeStyle = "rgba(194, 241, 170, 0.34)";
+        roundedRect(panelX, panelY, panelWidth, panelHeight, 12);
+        context.fill();
+        context.stroke();
+
+        context.textAlign = "center";
+        context.fillStyle = "#d8efc6";
+        context.font = "700 13px 'Space Grotesk', sans-serif";
+        context.fillText("CLOSE-UP HARVEST", world.width * 0.5, panelY + 22);
+
+        const barX = panelX + 18;
+        const barY = panelY + 36;
+        const barWidth = panelWidth - 36;
+        const barHeight = 16;
+
+        context.fillStyle = "rgba(164, 198, 144, 0.25)";
+        roundedRect(barX, barY, barWidth, barHeight, 8);
+        context.fill();
+
+        context.fillStyle = "#b7ff7f";
+        const filledWidth = barWidth * progress;
+        if (filledWidth > 0) {
+          roundedRect(barX, barY, filledWidth, barHeight, Math.min(8, filledWidth * 0.5));
+          context.fill();
+        }
+
+        context.fillStyle = "#e8f5de";
+        context.font = "700 11px 'Space Grotesk', sans-serif";
+        context.fillText(Math.round(progress * 100) + "% trimmed", world.width * 0.5, panelY + 64);
+        context.restore();
+      }
+
       function updateClouds(delta) {
         for (const cloud of clouds) {
           cloud.x -= cloud.speed * delta;
@@ -741,47 +953,65 @@
       }
 
       function updateGame(delta) {
-        updateClouds(delta);
+        updateClouds(activeHarvest ? delta * 0.35 : delta);
         updateParticles(delta);
+        zoneFlash = Math.max(0, zoneFlash - delta);
 
         if (!running) {
           return;
         }
 
         frame += delta;
-        speed = Math.min(config.maxSpeed, speed + 0.0019 * delta);
+
+        if (activeHarvest) {
+          activeHarvest.timer += delta;
+          activeHarvest.plant.bob += activeHarvest.plant.wobble * delta * 0.55;
+
+          if (Math.random() < 0.24 * delta) {
+            emitParticles(
+              activeHarvest.plant.x + activeHarvest.plant.width * 0.5,
+              activeHarvest.plant.y + activeHarvest.plant.height * 0.5,
+              1,
+              "#98de6e",
+              "#f8d15d"
+            );
+          }
+
+          if (activeHarvest.timer >= activeHarvest.duration) {
+            finishHarvest();
+          }
+
+          renderHud();
+          return;
+        }
+
+        speed = Math.min(config.maxSpeed, config.baseSpeed + harvested * 0.22 + frame * 0.0012);
 
         spawnClock += delta;
         if (spawnClock > nextSpawnIn) {
-          plants.push(createPlant());
-          spawnClock = 0;
-          nextSpawnIn = random(54, 106) / Math.max(1, speed / config.baseSpeed);
-        }
-
-        player.vy += config.gravity * delta;
-        player.y += player.vy * delta;
-        if (player.y >= world.groundY - player.height) {
-          player.y = world.groundY - player.height;
-          player.vy = 0;
-          player.onGround = true;
+          const lastPlant = plants[plants.length - 1];
+          if (!lastPlant || lastPlant.x < world.width - 240) {
+            plants.push(createPlant());
+            spawnClock = 0;
+            nextSpawnIn = random(52, 102) / Math.max(1, speed / config.baseSpeed);
+          }
         }
 
         for (let i = plants.length - 1; i >= 0; i -= 1) {
           const plant = plants[i];
-          plant.x -= speed * 4.2 * delta;
-          plant.bob += plant.wobble * delta;
-
-          if (intersects(playerBox(), plantBox(plant))) {
-            harvestPlant(plant);
-            plants.splice(i, 1);
+          if (plant.locked) {
             continue;
           }
+
+          plant.x -= speed * 4.2 * delta;
+          plant.bob += plant.wobble * delta;
 
           if (plant.x + plant.width < 0) {
             missed += 1;
             plants.splice(i, 1);
             if (missed >= world.missLimit) {
               endRun();
+              break;
             }
           }
         }
@@ -791,14 +1021,39 @@
 
       function drawGame() {
         drawBackground();
-        drawGround();
 
-        for (const plant of plants) {
-          drawPlant(plant);
+        const focusPlant = activeHarvest ? activeHarvest.plant : harvestCandidate();
+        const ready = Boolean(focusPlant && running && !activeHarvest);
+
+        context.save();
+        if (activeHarvest) {
+          const progress = clamp(activeHarvest.timer / activeHarvest.duration, 0, 1);
+          const entry = Math.min(1, progress * 3.4);
+          const exit = Math.max(0, (progress - 0.86) / 0.14);
+          const zoom = 1 + (entry - exit) * 0.9;
+          const focusX = (player.x + player.width * 0.5 + activeHarvest.plant.x + activeHarvest.plant.width * 0.5) * 0.5;
+          const focusY = (player.y + 18 + activeHarvest.plant.y + activeHarvest.plant.height * 0.35) * 0.5;
+          context.translate(world.width * 0.5, world.height * 0.5);
+          context.scale(zoom, zoom);
+          context.translate(-focusX, -focusY);
         }
 
-        drawPlayer();
+        drawGround();
+        if (!activeHarvest) {
+          drawHarvestZone(ready);
+        }
+
+        for (const plant of plants) {
+          drawPlant(plant, plant === focusPlant);
+        }
+
+        drawPlayer(ready);
         drawParticles();
+        context.restore();
+
+        if (activeHarvest) {
+          drawCloseUpOverlay();
+        }
       }
 
       function loop(timestamp) {
@@ -811,9 +1066,9 @@
       }
 
       function onActionKey(event) {
-        if (event.code === "Space" || event.code === "ArrowUp") {
+        if (event.code === "Space" || event.code === "ArrowUp" || event.code === "KeyH") {
           event.preventDefault();
-          jump();
+          attemptHarvest();
           return;
         }
 
@@ -829,15 +1084,19 @@
 
         if (event.code === "KeyR") {
           event.preventDefault();
-          paused = false;
-          running = false;
-          startRun();
+          startRun(true);
         }
       }
 
       window.addEventListener("keydown", onActionKey);
-      canvas.addEventListener("pointerdown", jump);
-      overlayAction.addEventListener("click", startRun);
+      canvas.addEventListener("pointerdown", attemptHarvest);
+      overlayAction.addEventListener("click", () => {
+        if (paused) {
+          startRun(false);
+          return;
+        }
+        startRun(true);
+      });
 
       requestAnimationFrame(loop);
     })();
