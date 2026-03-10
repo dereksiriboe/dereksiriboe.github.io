@@ -33,6 +33,29 @@ async function loadSourceConfig() {
   }
 }
 
+async function loadExistingPlaylistUrls() {
+  try {
+    const raw = await fs.readFile(OUTPUT_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    const rows = Array.isArray(parsed?.rows) ? parsed.rows : [];
+    const urls = [];
+    rows.forEach((row) => {
+      if (!Array.isArray(row)) return;
+      row.forEach((item) => {
+        if (item?.type === 'spotify' && item?.url) {
+          const normalized = normalizePlaylistUrl(item.url);
+          if (normalized && !urls.includes(normalized)) {
+            urls.push(normalized);
+          }
+        }
+      });
+    });
+    return urls;
+  } catch {
+    return [];
+  }
+}
+
 function normalizePlaylistUrl(idOrUrl) {
   if (!idOrUrl) return null;
   const value = String(idOrUrl).trim();
@@ -73,6 +96,46 @@ function extractPlaylistUrls(html) {
   return found;
 }
 
+function toTextMirrorUrl(url) {
+  const value = String(url || '').trim();
+  if (!value) return null;
+  if (value.startsWith('https://')) {
+    return `https://r.jina.ai/http://${value.slice('https://'.length)}`;
+  }
+  if (value.startsWith('http://')) {
+    return `https://r.jina.ai/http://${value.slice('http://'.length)}`;
+  }
+  return `https://r.jina.ai/http://${value}`;
+}
+
+async function fetchHtml(url) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    });
+
+    if (!response.ok) return null;
+    return await response.text();
+  } catch {
+    return null;
+  }
+}
+
+function mergeUnique(values) {
+  const seen = new Set();
+  const merged = [];
+  values.forEach((value) => {
+    if (!value || seen.has(value)) return;
+    seen.add(value);
+    merged.push(value);
+  });
+  return merged;
+}
+
 function toPlaylistData(playlistUrls) {
   return {
     rows: playlistUrls.map((url) => [
@@ -108,23 +171,29 @@ async function main() {
     );
   }
 
-  const response = await fetch(sourceUrl, {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-    }
-  });
+  const seedPlaylistUrl = normalizePlaylistUrl(sourceUrl);
+  const html = await fetchHtml(sourceUrl);
+  const primaryFound = html ? extractPlaylistUrls(html) : [];
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${sourceUrl}: HTTP ${response.status}`);
-  }
+  const mirrorUrl = toTextMirrorUrl(sourceUrl);
+  const mirrorHtml = mirrorUrl ? await fetchHtml(mirrorUrl) : null;
+  const mirrorFound = mirrorHtml ? extractPlaylistUrls(mirrorHtml) : [];
 
-  const html = await response.text();
-  const playlistUrls = extractPlaylistUrls(html).slice(0, limit);
+  const playlistUrls = mergeUnique([
+    seedPlaylistUrl,
+    ...primaryFound,
+    ...mirrorFound
+  ]).slice(0, limit);
 
   if (playlistUrls.length === 0) {
-    throw new Error(`No playlist URLs found in ${sourceUrl}`);
+    const existing = await loadExistingPlaylistUrls();
+    if (existing.length > 0) {
+      console.warn(
+        `No playlist URLs found from source; keeping existing ${existing.length} playlists in ${OUTPUT_PATH}`
+      );
+      return;
+    }
+    throw new Error(`No playlist URLs found and no existing playlists to preserve.`);
   }
 
   const payload = toPlaylistData(playlistUrls);
