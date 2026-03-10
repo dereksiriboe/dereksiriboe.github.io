@@ -783,20 +783,6 @@
       track.className = 'carousel-track';
       const items = Array.from(rowWrapper.children);
       items.forEach(item => track.appendChild(item));
-      items.forEach(item => {
-        const clone = item.cloneNode(true);
-        clone.classList.add('is-clone');
-        clone.setAttribute('aria-hidden', 'true');
-        if (clone.classList.contains('clickable')) {
-          clone.addEventListener('click', () => {
-            const media = clone.querySelector('img');
-            if (media) {
-              openLightbox(media.src, media.alt);
-            }
-          });
-        }
-        track.appendChild(clone);
-      });
       rowWrapper.appendChild(track);
       track.style.setProperty('--scroll-delay', `${-rowIndex * carouselPhaseOffsetSeconds}s`);
       track.style.setProperty(
@@ -804,23 +790,53 @@
         rowIndex % 2 === 0 ? 'scroll-left' : 'scroll-right'
       );
 
-      const updateDuration = () => {
+      const wireCloneClick = (clone) => {
+        if (!clone.classList.contains('clickable')) return;
+        clone.addEventListener('click', () => {
+          const media = clone.querySelector('img');
+          if (media) {
+            openLightbox(media.src, media.alt);
+          }
+        });
+      };
+
+      const rebuildTrack = () => {
         if (!track.isConnected) return;
-        const distance = Math.max(track.scrollWidth / 2, 0);
+        track.querySelectorAll('.is-clone').forEach(clone => clone.remove());
+
+        const styles = window.getComputedStyle(track);
+        const gap = Number.parseFloat(styles.columnGap || styles.gap || '0') || 0;
+        const itemWidths = items.reduce((total, item) => total + item.getBoundingClientRect().width, 0);
+        const distance = itemWidths + gap * Math.max(items.length - 1, 0);
+
         if (distance === 0) return;
+
+        const containerWidth = Math.max(rowWrapper.getBoundingClientRect().width, 0);
+        const cloneSetsNeeded = Math.max(1, Math.ceil(containerWidth / distance));
+
+        for (let setIndex = 0; setIndex < cloneSetsNeeded; setIndex += 1) {
+          items.forEach(item => {
+            const clone = item.cloneNode(true);
+            clone.classList.add('is-clone');
+            clone.setAttribute('aria-hidden', 'true');
+            wireCloneClick(clone);
+            track.appendChild(clone);
+          });
+        }
+
         track.style.setProperty('--scroll-distance', `${distance}px`);
         track.style.setProperty('--scroll-duration', `${distance / speedPxPerSecond}s`);
       };
 
-      registerCarouselUpdater(() => requestAnimationFrame(updateDuration));
-      requestAnimationFrame(updateDuration);
+      registerCarouselUpdater(() => requestAnimationFrame(rebuildTrack));
+      requestAnimationFrame(rebuildTrack);
 
       track.querySelectorAll('img, video').forEach(media => {
         if (media.complete || media.readyState >= 2) {
           return;
         }
-        media.addEventListener('load', updateDuration, { once: true });
-        media.addEventListener('loadeddata', updateDuration, { once: true });
+        media.addEventListener('load', rebuildTrack, { once: true });
+        media.addEventListener('loadeddata', rebuildTrack, { once: true });
       });
     }
 

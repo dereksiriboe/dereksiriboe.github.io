@@ -104,7 +104,9 @@ echo "2. Generating combined library.json..."
 echo '{"rows": [' > "$REPO_DIR/data/library.json"
 
 first_folder=true
-for subfolder in "$REPO_DIR/images/library"/*; do
+IFS=$'\n'
+for subfolder in $(ls -1dt "$REPO_DIR/images/library"/*/ 2>/dev/null); do
+    subfolder="${subfolder%/}"
     [ -d "$subfolder" ] || continue
 
     subfolder_name=$(basename "$subfolder")
@@ -143,6 +145,7 @@ for subfolder in "$REPO_DIR/images/library"/*; do
 
     echo ']' >> "$REPO_DIR/data/library.json"
 done
+unset IFS
 
 echo '' >> "$REPO_DIR/data/library.json"
 echo '  ]' >> "$REPO_DIR/data/library.json"
@@ -154,7 +157,8 @@ echo ""
 echo "3. Generating manifest.json..."
 echo '{' > "$REPO_DIR/data/manifest.json"
 echo '  "project": [' >> "$REPO_DIR/data/manifest.json"
-echo '    "library"' >> "$REPO_DIR/data/manifest.json"
+echo '    "library",' >> "$REPO_DIR/data/manifest.json"
+echo '    "playlists"' >> "$REPO_DIR/data/manifest.json"
 echo '  ]' >> "$REPO_DIR/data/manifest.json"
 echo '}' >> "$REPO_DIR/data/manifest.json"
 
