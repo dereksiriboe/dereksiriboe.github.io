@@ -13,6 +13,7 @@
       --accent-orange: #FF6B35;
       --max-width: 1200px;
       --gutter: 0px;
+      --carousel-gap: 14px;
     }
 
     *, *::before, *::after {
@@ -153,7 +154,7 @@
     .carousel-track {
       display: flex;
       flex-wrap: nowrap;
-      gap: var(--gutter);
+      gap: var(--carousel-gap);
       align-items: flex-start;
       width: max-content;
       animation: var(--scroll-animation-name, scroll-left) var(--scroll-duration, 40s) linear var(--scroll-delay, 0s) infinite;
@@ -807,7 +808,8 @@
         const styles = window.getComputedStyle(track);
         const gap = Number.parseFloat(styles.columnGap || styles.gap || '0') || 0;
         const itemWidths = items.reduce((total, item) => total + item.getBoundingClientRect().width, 0);
-        const distance = itemWidths + gap * Math.max(items.length - 1, 0);
+        const trailingGap = items.length > 0 ? gap : 0;
+        const distance = itemWidths + gap * Math.max(items.length - 1, 0) + trailingGap;
 
         if (distance === 0) return;
 
