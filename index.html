@@ -156,7 +156,7 @@
       gap: var(--gutter);
       align-items: flex-start;
       width: max-content;
-      animation: scroll-left var(--scroll-duration, 40s) linear var(--scroll-delay, 0s) infinite;
+      animation: var(--scroll-animation-name, scroll-left) var(--scroll-duration, 40s) linear var(--scroll-delay, 0s) infinite;
       transform: translateX(0);
     }
 
@@ -430,6 +430,15 @@
         transform: translateX(calc(-1 * var(--scroll-distance, 100%)));
       }
     }
+
+    @keyframes scroll-right {
+      from {
+        transform: translateX(calc(-1 * var(--scroll-distance, 100%)));
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -544,8 +553,8 @@
     const carouselUpdaters = new Set();
     let carouselResizeBound = false;
     const carouselScrollSpeed = 40;
-    const carouselSpeedPattern = [20, 30, 44, 62, 84];
-    const carouselPhaseOffsetSeconds = 2.5;
+    const carouselSpeedPattern = [16, 24, 36, 52, 72];
+    const carouselPhaseOffsetSeconds = 4;
     let carouselRowCounter = 0;
 
     function buildPrimaryNav(currentSection = null) {
@@ -790,6 +799,10 @@
       });
       rowWrapper.appendChild(track);
       track.style.setProperty('--scroll-delay', `${-rowIndex * carouselPhaseOffsetSeconds}s`);
+      track.style.setProperty(
+        '--scroll-animation-name',
+        rowIndex % 2 === 0 ? 'scroll-left' : 'scroll-right'
+      );
 
       const updateDuration = () => {
         if (!track.isConnected) return;
