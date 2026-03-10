@@ -156,12 +156,8 @@
       gap: var(--gutter);
       align-items: flex-start;
       width: max-content;
-      animation: scroll-left var(--scroll-duration, 40s) linear infinite;
+      animation: scroll-left var(--scroll-duration, 40s) linear var(--scroll-delay, 0s) infinite;
       transform: translateX(0);
-    }
-
-    .carousel-track .is-clone {
-      pointer-events: none;
     }
 
     .grid-item {
@@ -548,7 +544,8 @@
     const carouselUpdaters = new Set();
     let carouselResizeBound = false;
     const carouselScrollSpeed = 40;
-    const carouselSpeedPattern = [28, 34, 40, 46, 52];
+    const carouselSpeedPattern = [20, 30, 44, 62, 84];
+    const carouselPhaseOffsetSeconds = 2.5;
     let carouselRowCounter = 0;
 
     function buildPrimaryNav(currentSection = null) {
@@ -771,7 +768,7 @@
       return carouselSpeedPattern[rowIndex % carouselSpeedPattern.length] || carouselScrollSpeed;
     }
 
-    function setupCarouselRow(rowWrapper, speedPxPerSecond = carouselScrollSpeed) {
+    function setupCarouselRow(rowWrapper, speedPxPerSecond = carouselScrollSpeed, rowIndex = 0) {
       rowWrapper.classList.add('carousel-row');
       const track = document.createElement('div');
       track.className = 'carousel-track';
@@ -781,9 +778,18 @@
         const clone = item.cloneNode(true);
         clone.classList.add('is-clone');
         clone.setAttribute('aria-hidden', 'true');
+        if (clone.classList.contains('clickable')) {
+          clone.addEventListener('click', () => {
+            const media = clone.querySelector('img');
+            if (media) {
+              openLightbox(media.src, media.alt);
+            }
+          });
+        }
         track.appendChild(clone);
       });
       rowWrapper.appendChild(track);
+      track.style.setProperty('--scroll-delay', `${-rowIndex * carouselPhaseOffsetSeconds}s`);
 
       const updateDuration = () => {
         if (!track.isConnected) return;
@@ -825,7 +831,7 @@
           if (rowWrapper.children.length > 0) {
             if (enableCarousel) {
               const rowSpeed = getCarouselSpeedForRow(carouselRowCounter);
-              setupCarouselRow(rowWrapper, rowSpeed);
+              setupCarouselRow(rowWrapper, rowSpeed, carouselRowCounter);
               carouselRowCounter += 1;
             }
             grid.appendChild(rowWrapper);
