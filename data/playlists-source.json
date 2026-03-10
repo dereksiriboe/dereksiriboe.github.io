@@ -1,4 +1,5 @@
 {
   "url": "https://open.spotify.com/user/YOUR_USER_ID/playlists",
-  "limit": 24
+  "userId": "YOUR_USER_ID",
+  "limit": 200
 }

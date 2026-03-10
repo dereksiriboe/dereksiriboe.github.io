@@ -24,6 +24,10 @@ jobs:
       - name: Update playlists data
         env:
           SPOTIFY_PLAYLISTS_PAGE_URL: ${{ secrets.SPOTIFY_PLAYLISTS_PAGE_URL }}
+          SPOTIFY_USER_ID: ${{ secrets.SPOTIFY_USER_ID }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_PLAYLIST_LIMIT: ${{ secrets.SPOTIFY_PLAYLIST_LIMIT }}
         run: node scripts/update-playlists.mjs
 
       - name: Commit and push if changed
@@ -36,5 +40,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/playlists.json
-          git commit -m "Update playlists from Spotify scrape"
+          git commit -m "Update playlists from Spotify source"
           git push
