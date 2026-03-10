@@ -176,6 +176,28 @@ async function getSpotifyAccessToken(clientId, clientSecret) {
   return json.access_token;
 }
 
+async function getSpotifyUserAccessToken(clientId, clientSecret, refreshToken) {
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`
+  });
+
+  if (!response.ok) {
+    throw new Error(`Spotify refresh token request failed: HTTP ${response.status}`);
+  }
+
+  const json = await response.json();
+  if (!json?.access_token) {
+    throw new Error('Spotify refresh token response missing access_token');
+  }
+  return json.access_token;
+}
+
 async function fetchPlaylistsViaSpotifyApi({ userId, limit, accessToken }) {
   const collected = [];
   let endpoint = `https://api.spotify.com/v1/users/${encodeURIComponent(userId)}/playlists?limit=50&offset=0`;
@@ -189,6 +211,37 @@ async function fetchPlaylistsViaSpotifyApi({ userId, limit, accessToken }) {
 
     if (!response.ok) {
       throw new Error(`Spotify playlists request failed: HTTP ${response.status}`);
+    }
+
+    const json = await response.json();
+    const items = Array.isArray(json?.items) ? json.items : [];
+
+    items.forEach((item) => {
+      const normalized = normalizePlaylistUrl(item?.external_urls?.spotify || item?.id);
+      if (normalized && !collected.includes(normalized)) {
+        collected.push(normalized);
+      }
+    });
+
+    endpoint = json?.next || null;
+  }
+
+  return collected.slice(0, limit);
+}
+
+async function fetchPlaylistsForCurrentUser({ limit, accessToken }) {
+  const collected = [];
+  let endpoint = 'https://api.spotify.com/v1/me/playlists?limit=50&offset=0';
+
+  while (endpoint && collected.length < limit) {
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Spotify me/playlists request failed: HTTP ${response.status}`);
     }
 
     const json = await response.json();
@@ -243,9 +296,22 @@ async function main() {
 
   const clientId = process.env.SPOTIFY_CLIENT_ID || cfg.clientId || null;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET || cfg.clientSecret || null;
+  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN || cfg.refreshToken || null;
 
   const apiFound = [];
-  if (spotifyUserId && clientId && clientSecret) {
+  if (clientId && clientSecret && refreshToken) {
+    try {
+      const accessToken = await getSpotifyUserAccessToken(clientId, clientSecret, refreshToken);
+      const urls = await fetchPlaylistsForCurrentUser({
+        limit,
+        accessToken
+      });
+      apiFound.push(...urls);
+      console.log(`Spotify OAuth API found ${urls.length} playlists from /v1/me/playlists`);
+    } catch (error) {
+      console.warn(`Spotify OAuth API fetch failed: ${error.message || error}`);
+    }
+  } else if (spotifyUserId && clientId && clientSecret) {
     try {
       const accessToken = await getSpotifyAccessToken(clientId, clientSecret);
       const urls = await fetchPlaylistsViaSpotifyApi({

@@ -1,5 +1,6 @@
 {
   "url": "https://open.spotify.com/user/YOUR_USER_ID/playlists",
   "userId": "YOUR_USER_ID",
+  "refreshToken": "YOUR_REFRESH_TOKEN",
   "limit": 200
 }
