@@ -548,6 +548,8 @@
     const carouselUpdaters = new Set();
     let carouselResizeBound = false;
     const carouselScrollSpeed = 40;
+    const carouselSpeedPattern = [28, 34, 40, 46, 52];
+    let carouselRowCounter = 0;
 
     function buildPrimaryNav(currentSection = null) {
       primaryNav.innerHTML = '';
@@ -592,6 +594,7 @@
         currentInfiniteScrollSentinel = null;
       }
       carouselUpdaters.clear();
+      carouselRowCounter = 0;
       content.appendChild(homeTemplate.content.cloneNode(true));
       buildPrimaryNav(null);
 
@@ -764,7 +767,11 @@
       }
     }
 
-    function setupCarouselRow(rowWrapper) {
+    function getCarouselSpeedForRow(rowIndex) {
+      return carouselSpeedPattern[rowIndex % carouselSpeedPattern.length] || carouselScrollSpeed;
+    }
+
+    function setupCarouselRow(rowWrapper, speedPxPerSecond = carouselScrollSpeed) {
       rowWrapper.classList.add('carousel-row');
       const track = document.createElement('div');
       track.className = 'carousel-track';
@@ -783,7 +790,7 @@
         const distance = Math.max(track.scrollWidth / 2, 0);
         if (distance === 0) return;
         track.style.setProperty('--scroll-distance', `${distance}px`);
-        track.style.setProperty('--scroll-duration', `${distance / carouselScrollSpeed}s`);
+        track.style.setProperty('--scroll-duration', `${distance / speedPxPerSecond}s`);
       };
 
       registerCarouselUpdater(() => requestAnimationFrame(updateDuration));
@@ -817,7 +824,9 @@
           });
           if (rowWrapper.children.length > 0) {
             if (enableCarousel) {
-              setupCarouselRow(rowWrapper);
+              const rowSpeed = getCarouselSpeedForRow(carouselRowCounter);
+              setupCarouselRow(rowWrapper, rowSpeed);
+              carouselRowCounter += 1;
             }
             grid.appendChild(rowWrapper);
           }
@@ -894,6 +903,7 @@
         currentInfiniteScrollSentinel = null;
       }
       carouselUpdaters.clear();
+      carouselRowCounter = 0;
 
       content.appendChild(loadingTemplate.content.cloneNode(true));
       try {
