@@ -364,6 +364,8 @@
       let best = loadBest();
       let activeHarvest = null;
       let zoneFlash = 0;
+      let lastHarvestPlant = null;
+      let endCinematic = null;
 
       renderHud();
       setOverlay(
@@ -434,6 +436,8 @@
         speed = config.baseSpeed;
         activeHarvest = null;
         zoneFlash = 0;
+        lastHarvestPlant = null;
+        endCinematic = null;
         renderHud();
       }
 
@@ -471,6 +475,9 @@
       }
 
       function currentModeText() {
+        if (endCinematic) {
+          return "Crystal";
+        }
         if (!running) {
           return paused ? "Paused" : "Waiting";
         }
@@ -537,6 +544,49 @@
         setOverlay("Paused", "Press Space, Up, or the button to continue.", "Resume", true);
       }
 
+      function showRunCompleteOverlay(message) {
+        setOverlay("Run Complete", message, "Play Again", true);
+      }
+
+      function startEndCinematic(message) {
+        if (!lastHarvestPlant) {
+          showRunCompleteOverlay(message);
+          return;
+        }
+
+        const plantHeight = clamp(lastHarvestPlant.height * 2.4, 170, 250);
+        const plantWidth = clamp(lastHarvestPlant.width * 2.75, 70, 114);
+        const plant = {
+          x: world.width * 0.5 - plantWidth * 0.5,
+          y: world.groundY - plantHeight - 10,
+          width: plantWidth,
+          height: plantHeight,
+          bob: lastHarvestPlant.bob,
+          wobble: 0.045,
+          locked: true,
+        };
+
+        const palette = ["159,225,112", "232,252,205", "253,214,111", "142,214,255"];
+        const crystals = Array.from({ length: 170 }, () => ({
+          ox: random(-plant.width * 0.72, plant.width * 0.72),
+          oy: random(-plant.height * 0.86, plant.height * 0.22),
+          driftX: random(-36, 36),
+          driftY: random(-54, -10),
+          size: random(3, 8),
+          delay: random(0.04, 0.82),
+          color: palette[Math.floor(random(0, palette.length))],
+        }));
+
+        endCinematic = {
+          timer: 0,
+          duration: 94,
+          plant,
+          crystals,
+          message,
+        };
+        setOverlay("", "", "", false);
+      }
+
       function endRun() {
         running = false;
         paused = false;
@@ -548,12 +598,8 @@
         }
 
         const noun = harvested === 1 ? "plant" : "plants";
-        setOverlay(
-          "Run Complete",
-          "You harvested " + harvested + " " + noun + " in close-up mode. Missed " + missed + ". Hit start to run it back.",
-          "Play Again",
-          true
-        );
+        const message = "You harvested " + harvested + " " + noun + " in close-up mode. Missed " + missed + ". Hit start to run it back.";
+        startEndCinematic(message);
         renderHud();
       }
 
@@ -581,6 +627,13 @@
         }
 
         const plant = activeHarvest.plant;
+        lastHarvestPlant = {
+          width: plant.width,
+          height: plant.height,
+          bob: plant.bob,
+          wobble: plant.wobble,
+        };
+
         const index = plants.indexOf(plant);
         if (index >= 0) {
           plants.splice(index, 1);
@@ -608,6 +661,10 @@
       }
 
       function attemptHarvest() {
+        if (endCinematic) {
+          return;
+        }
+
         if (!running && !paused) {
           startRun(false);
           return;
@@ -916,6 +973,95 @@
         context.restore();
       }
 
+      function drawCrystalPixels(cinematic, progress) {
+        const centerX = cinematic.plant.x + cinematic.plant.width * 0.5;
+        const centerY = cinematic.plant.y + cinematic.plant.height * 0.5;
+
+        for (const crystal of cinematic.crystals) {
+          const t = clamp((progress - crystal.delay) / (1 - crystal.delay), 0, 1);
+          if (t <= 0) {
+            continue;
+          }
+
+          const x = centerX + crystal.ox + crystal.driftX * t;
+          const y = centerY + crystal.oy + crystal.driftY * t;
+          const alpha = (1 - t) * 0.88;
+
+          context.fillStyle = "rgba(" + crystal.color + "," + alpha.toFixed(3) + ")";
+          context.fillRect(
+            Math.round(x),
+            Math.round(y),
+            Math.max(1, Math.round(crystal.size)),
+            Math.max(1, Math.round(crystal.size))
+          );
+        }
+      }
+
+      function drawEndCrystalScene() {
+        if (!endCinematic) {
+          return;
+        }
+
+        const progress = clamp(endCinematic.timer / endCinematic.duration, 0, 1);
+        const entry = Math.min(1, progress * 2.4);
+        const zoom = 1.2 + entry * 0.55;
+        const plant = endCinematic.plant;
+
+        drawGround();
+
+        context.save();
+        context.translate(world.width * 0.5, world.height * 0.55);
+        context.scale(zoom, zoom);
+        context.translate(-world.width * 0.5, -world.height * 0.55);
+        drawPlant(plant, true);
+        drawCrystalPixels(endCinematic, progress);
+        drawParticles();
+        context.restore();
+
+        context.save();
+        const vignette = context.createLinearGradient(0, 0, 0, world.height);
+        vignette.addColorStop(0, "rgba(4, 13, 8, 0.46)");
+        vignette.addColorStop(0.35, "rgba(4, 13, 8, 0.16)");
+        vignette.addColorStop(1, "rgba(4, 13, 8, 0.54)");
+        context.fillStyle = vignette;
+        context.fillRect(0, 0, world.width, world.height);
+
+        const panelWidth = 330;
+        const panelHeight = 72;
+        const panelX = (world.width - panelWidth) * 0.5;
+        const panelY = 24;
+        context.fillStyle = "rgba(7, 20, 12, 0.8)";
+        context.strokeStyle = "rgba(209, 250, 195, 0.34)";
+        roundedRect(panelX, panelY, panelWidth, panelHeight, 12);
+        context.fill();
+        context.stroke();
+
+        context.textAlign = "center";
+        context.fillStyle = "#e4f6d4";
+        context.font = "700 14px 'Space Grotesk', sans-serif";
+        context.fillText("HARVEST CRYSTALLIZING", world.width * 0.5, panelY + 24);
+
+        const barX = panelX + 18;
+        const barY = panelY + 40;
+        const barWidth = panelWidth - 36;
+        const barHeight = 14;
+        context.fillStyle = "rgba(157, 199, 139, 0.28)";
+        roundedRect(barX, barY, barWidth, barHeight, 7);
+        context.fill();
+
+        const fillWidth = barWidth * progress;
+        if (fillWidth > 0) {
+          context.fillStyle = "#d0ff93";
+          roundedRect(barX, barY, fillWidth, barHeight, Math.min(7, fillWidth * 0.5));
+          context.fill();
+        }
+
+        context.fillStyle = "#f0fae8";
+        context.font = "700 11px 'Space Grotesk', sans-serif";
+        context.fillText(Math.round(progress * 100) + "% crystallized", world.width * 0.5, panelY + 64);
+        context.restore();
+      }
+
       function updateClouds(delta) {
         for (const cloud of clouds) {
           cloud.x -= cloud.speed * delta;
@@ -956,6 +1102,31 @@
         updateClouds(activeHarvest ? delta * 0.35 : delta);
         updateParticles(delta);
         zoneFlash = Math.max(0, zoneFlash - delta);
+
+        if (endCinematic) {
+          frame += delta * 0.5;
+          endCinematic.timer += delta;
+          endCinematic.plant.bob += endCinematic.plant.wobble * delta * 0.55;
+
+          if (Math.random() < 0.28 * delta) {
+            emitParticles(
+              endCinematic.plant.x + endCinematic.plant.width * 0.5,
+              endCinematic.plant.y + endCinematic.plant.height * 0.38,
+              1,
+              "#d8ffb3",
+              "#c0e8ff"
+            );
+          }
+
+          if (endCinematic.timer >= endCinematic.duration) {
+            const message = endCinematic.message;
+            endCinematic = null;
+            showRunCompleteOverlay(message);
+          }
+
+          renderHud();
+          return;
+        }
 
         if (!running) {
           return;
@@ -1021,6 +1192,11 @@
 
       function drawGame() {
         drawBackground();
+
+        if (endCinematic) {
+          drawEndCrystalScene();
+          return;
+        }
 
         const focusPlant = activeHarvest ? activeHarvest.plant : harvestCandidate();
         const ready = Boolean(focusPlant && running && !activeHarvest);
